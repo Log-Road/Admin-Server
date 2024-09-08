@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package dias;
+
+service JwtAuthGuard {
+  rpc canActivate(JwtGuardRequest) returns (IsValid) {}
+}
+
+message IsValid {
+  bool isValid = 1;
+}
+
+message JwtGuardRequest {
+  string authorization = 1;
+}
