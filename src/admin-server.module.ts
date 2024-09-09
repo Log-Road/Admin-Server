@@ -10,7 +10,7 @@ import { WinstonInstance } from "utils/winston";
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,
-      envFilePath: "../../../.env",
+      envFilePath: "../.env",
     }),
     WinstonModule.forRoot({
       instance: WinstonInstance,

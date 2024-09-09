@@ -32,50 +32,30 @@ jobs:
             ${{ runner.os }}
 
       - name: Install package
-        if: steps.cache.outputs.cache-hit == 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         run: pnpm i --no-frozen-lockfile
 
       - name: env set
         working-directory: ./
         run: |
           touch .env
-          echo POSTGRESQL_DB_URL=${{secrets.POSTGRESQL_DB_URL}} >> .env
-          echo JWT_PRIVATE=${{secrets.JWT_PRIVATE}} >> .env
-          echo JWT_SECRET=${{secrets.JWT_SECRET}} >> .env
-          echo PORT=${{secrets.PORT}} >> .env
-          echo SALT=${{secrets.SALT}} >> .env
-          echo ORIGIN=${{secrets.ORIGIN}} >> .env
-          echo GOOGLE_CLIENT_ID=${{secrets.GOOGLE_CLIENT_ID}} >> .env
-          echo GOOGLE_SECURE_PASSWORD=${{secrets.GOOGLE_SECURE_PASSWORD}} >> .env
-          echo GOOGLE_CALLBACK_URL=${{secrets.GOOGLE_CALLBACK_URL}} >> .env
-          echo LOG_EMAIL=${{secrets.LOG_EMAIL}} >> .env
-          echo AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY}} >> .env
-          echo AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}} >> .env
           echo POSTGRESQL_DB=${{secrets.POSTGRESQL_DB}} >> .env
-          echo EMAIL_HEADER=${{secrets.EMAIL_HEADER}} >> .env
-          echo REDIS_HOST=${{secrets.REDIS_HOST}} >> .env
-          echo REDIS_PORT=${{secrets.REDIS_PORT}} >> .env
-          echo REDIS_PASSWORD=${{secrets.REDIS_PASSWORD}} >> .env
+          echo PORT=${{secrets.PORT}} >> .env
+          echo ORIGIN=${{secrets.ORIGIN}} >> .env
           echo TESTING_TOKEN=${{secrets.TESTING_TOKEN}} >> .env
           echo TESTING_PASSWORD=${{secrets.TESTING_PASSWORD}} >> .env
 
       - name: prisma set
-        run: npx prisma generate
+        run: npx prisma generate --schema=src/prisma/schema.prisma
 
       - name: build
         run: |
           pnpm build
-          cp -r apps/dias/src/prisma/client dist/apps/dias/
-          cp -r apps/admin-server/src/prisma/client dist/apps/admin-server/
-          cp -r apps/asset-server/src/prisma/client dist/apps/asset-server/
+          cp -r apps/admin-server/src/prisma/client dist/
           cp package.prod.json dist/package.json
-          cp docker-compose.yml dist/docker-compose.yml
 
       - name: docker
-        run: |
-          docker build ./dist -t ${{secrets.DOCKERHUB_USERNAME}}/dias:latest -f ./dias.dockerfile
-          docker build ./dist -t ${{secrets.DOCKERHUB_USERNAME}}/admin-server:latest -f ./admin-server.dockerfile
-          docker build ./dist -t ${{secrets.DOCKERHUB_USERNAME}}/asset-server:latest -f ./asset-server.dockerfile
+        run: docker build ./dist -t ${{secrets.DOCKERHUB_USERNAME}}/admin-server:latest -f ./dockerfile
 
       - name: Login to Docker Hub
         uses: docker/login-action@v1
@@ -84,10 +64,7 @@ jobs:
           password: ${{secrets.DOCKERHUB_PASSWORD}}
 
       - name: push to Docker Hub
-        run: |
-          docker push ${{secrets.DOCKERHUB_USERNAME}}/dias:latest
-          docker push ${{secrets.DOCKERHUB_USERNAME}}/asset-server:latest
-          docker push ${{secrets.DOCKERHUB_USERNAME}}/admin-server:latest
+        run: docker push ${{secrets.DOCKERHUB_USERNAME}}/asset-server:latest
 
       - name: Get GitHub Actions IP
         id: ip
@@ -102,7 +79,7 @@ jobs:
 
       - name: Add Github Actions IP to Security group
         env:
-          AWS_DEFAULT_REGION: ap-northeast-2
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
         run: |
           aws ec2 authorize-security-group-ingress \
           --group-id ${{ secrets.AWS_EC2_SG_ID }} \

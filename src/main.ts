@@ -10,7 +10,7 @@ import { JwtAuthGuard } from "guard/jwt/jwt.auth.guard";
 
 async function bootstrap() {
   configDotenv({
-    path: "../../../.env",
+    path: "../.env",
   });
 
   const logger = WinstonModule.createLogger({
@@ -35,8 +35,8 @@ async function bootstrap() {
   );
   app.useGlobalGuards(new AdminValidateGuard(new JwtAuthGuard()));
 
-  await app.listen(8002, () => {
-    console.log("admin-server started");
+  await app.listen(Number(process.env.PORT ?? "8082"), () => {
+    logger.log(`ADMIN-SERVER HAD STARTED`);
   });
 }
 bootstrap();
