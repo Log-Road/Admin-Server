@@ -51,7 +51,7 @@ jobs:
       - name: build
         run: |
           pnpm build
-          cp -r apps/admin-server/src/prisma/client dist/
+          cp -r src/prisma/client dist/
           cp package.prod.json dist/package.json
 
       - name: docker
@@ -99,8 +99,6 @@ jobs:
             newgrp docker
             echo "${{ secrets.DOCKERHUB_PASSWORD }}" >> ~/my_password.txt
             cat ~/my_password.txt | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-            docker-compose pull
-            docker-compose up -d
             y | docker rm $(docker ps -a -f status=exited -q)
             y | docker image prune
 
