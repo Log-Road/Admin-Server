@@ -36,7 +36,6 @@ jobs:
         run: pnpm i --no-frozen-lockfile
 
       - name: env set
-        working-directory: ./
         run: |
           touch .env
           echo POSTGRESQL_DB=${{secrets.POSTGRESQL_DB}} >> .env
@@ -52,6 +51,7 @@ jobs:
         run: |
           pnpm build
           cp -r src/prisma/client dist/
+          cp .env dist/.env
           cp package.json dist/package.json
           cp pnpm-lock.yaml dist/pnpm-lock.yaml
 
