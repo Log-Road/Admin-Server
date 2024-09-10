@@ -12,13 +12,12 @@ COPY package.json ./
 COPY pnpm-lock.yaml ./
 COPY .env ./
 
-RUN cat .env
-
 RUN pnpm i --no-frozen-lockfile
 
 FROM set AS build
 
 COPY . .
+COPY .env .
 RUN export NODE_ENV=prod
 RUN cd ..
 

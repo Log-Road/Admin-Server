@@ -35,15 +35,6 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: pnpm i --no-frozen-lockfile
 
-      - name: env set
-        run: |
-          touch .env
-          echo POSTGRESQL_DB=${{secrets.POSTGRESQL_DB}} >> .env
-          echo PORT=${{secrets.PORT}} >> .env
-          echo ORIGIN=${{secrets.ORIGIN}} >> .env
-          echo TESTING_TOKEN=${{secrets.TESTING_TOKEN}} >> .env
-          echo TESTING_PASSWORD=${{secrets.TESTING_PASSWORD}} >> .env
-
       - name: prisma set
         run: npx prisma generate --schema=src/prisma/schema.prisma
 
@@ -99,7 +90,12 @@ jobs:
             sudo usermod -aG docker $USER
             echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/admin-server:latest
-            sudo docker run -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} ${{ secrets.DOCKERHUB_USERNAME }}/admin-server:latest
+            sudo docker run -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} ${{ secrets.DOCKERHUB_USERNAME }}/admin-server:latest \
+              --env POSTGRESQL_DB=${{ secrets.POSTGRESQL_DB }} \
+              --env PORT=${{ secrets.PORT }} \
+              --env ORIGIN=${{ secrets.ORIGIN }} \
+              --env TESTING_TOKEN=${{ secrets.TESTING_TOKEN }} \
+              --env TESTING_PASSWORD=${{ secrets.TESTING_PASSWORD }} \
             sudo docker rm -f $(sudo docker ps -a -f status=exited -q)
             sudo docker image prune -f
 
