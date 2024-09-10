@@ -35,6 +35,15 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: pnpm i --no-frozen-lockfile
 
+      - name: env set
+        run: |
+          touch .env
+          echo POSTGRESQL_DB=${{secrets.POSTGRESQL_DB}} >> .env
+          echo PORT=${{secrets.PORT}} >> .env
+          echo ORIGIN=${{secrets.ORIGIN}} >> .env
+          echo TESTING_TOKEN=${{secrets.TESTING_TOKEN}} >> .env
+          echo TESTING_PASSWORD=${{secrets.TESTING_PASSWORD}} >> .env
+
       - name: prisma set
         run: npx prisma generate --schema=src/prisma/schema.prisma
 
