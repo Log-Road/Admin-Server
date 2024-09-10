@@ -94,8 +94,7 @@ jobs:
           username: ${{ secrets.PROD_AWS_USER }}
           key: ${{ secrets.PROD_AWS_SSH_KEY }}
           script: |
-            whoami
-            groupadd docker
+            sudo groupadd docker
             sudo usermod -aG docker $USER
             newgrp docker
             echo "${{ secrets.DOCKERHUB_PASSWORD }}" >> ~/my_password.txt
