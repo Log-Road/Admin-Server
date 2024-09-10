@@ -10,6 +10,7 @@ WORKDIR /app
 RUN npm install -g pnpm
 COPY package.json ./
 COPY pnpm-lock.yaml ./
+COPY .env ./
 
 RUN pnpm i --no-frozen-lockfile
 
