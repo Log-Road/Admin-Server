@@ -91,7 +91,7 @@ jobs:
         with:
           key: ${{ secrets.PROD_AWS_SSH_KEY }}
           host: ${{ secrets.PROD_AWS_HOST }}
-          port: ${{ secrets.AWS_PORT }}
+          port: 22
           username: ${{ secrets.PROD_AWS_USER }}
           script: |
             whoami
