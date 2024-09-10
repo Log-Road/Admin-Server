@@ -94,13 +94,7 @@ jobs:
           port: ${{ secrets.AWS_PORT }}
           username: ${{ secrets.PROD_AWS_USER }}
           script: |
-            groupadd docker
-            sudo usermod -aG docker $USER
-            newgrp docker
-            echo "${{ secrets.DOCKERHUB_PASSWORD }}" >> ~/my_password.txt
-            cat ~/my_password.txt | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-            y | docker rm $(docker ps -a -f status=exited -q)
-            y | docker image prune
+            whoami
 
       - name: Remove Github Actions IP From Security Group
         run: |
