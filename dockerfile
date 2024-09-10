@@ -7,7 +7,11 @@ ENV NODE_VERSION 20.12.2
 RUN mkdir -p /app
 WORKDIR /app
 
-RUN apk update 
+RUN npm install -g pnpm
+COPY package.json ./
+COPY pnpm-lock.yaml ./
+
+RUN pnpm i --no-frozen-lockfile
 
 FROM set AS build
 
