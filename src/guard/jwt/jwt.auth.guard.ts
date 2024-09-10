@@ -12,12 +12,12 @@ export class JwtAuthGuard implements CanActivate {
 
   // @GrpcMethod()
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    // const req = await context.switchToHttp().getRequest();
+    const req = await context.switchToHttp().getRequest();
 
-    // const token: string = req.headers['authorization'];
+    const token: string = req.headers['authorization'];
 
-    // if (!token) throw new UnauthorizedException('토큰 필요');
-    // if (!token.includes(' ')) throw new UnauthorizedException('토큰 형식 오류');
+    if (!token) throw new UnauthorizedException('토큰 필요');
+    if (!token.includes(' ')) throw new UnauthorizedException('토큰 형식 오류');
 
     // const { id } = await this.jwt.decode(token.split(' ')[1]);
 

@@ -6,16 +6,18 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { ROLE } from "types/role.type";
-import { JwtAuthGuard } from "guard/jwt/jwt.auth.guard";
+import { ROLE } from "../../types/role.type";
+import { JwtAuthGuard } from "../jwt/jwt.auth.guard";
+import { configDotenv } from "dotenv";
 
 const configService = new ConfigService();
+configDotenv();
 
 describe("AdminValidatorGuard", () => {
   let guard: AdminValidateGuard;
 
-  const authorization = configService.get<string>("TESTING_TOKEN")
-  const password = configService.get<string>("TESTING_PASSWORD")
+  const authorization = configService.get<string>("TESTING_TOKEN");
+  const password = configService.get<string>("TESTING_PASSWORD");
 
   const jwtGuardMock = {
     canActivate: jest.fn(async (context: ExecutionContext) => {
@@ -113,7 +115,7 @@ describe("AdminValidatorGuard", () => {
                 email: "zxcv@asdf.qwer",
                 password:
                   "$2b$10$J/nx4iLm.pFujphaz0bOn.9jOkDymdLHjJUN/B6ic820BJVyJuu1e",
-                role: "Admin",
+                role: ROLE.Admin,
                 account_provided: "local",
               },
             },
@@ -130,7 +132,7 @@ describe("AdminValidatorGuard", () => {
     });
 
     it("[401] (1) 토큰 형식 오류", async () => {
-      const authorization = "aheijka.dl.2kiodhjoal"
+      const authorization = "aheijka.dl.2kiodhjoal";
 
       req = {
         switchToHttp: jest.fn().mockReturnValue({
@@ -156,7 +158,7 @@ describe("AdminValidatorGuard", () => {
     });
 
     it("[401] (2) 잘못된 토큰", async () => {
-      const authorization = "aheijka.dl.2kiodhjoal"
+      const authorization = "aheijka.dl.2kiodhjoal";
 
       req = {
         switchToHttp: jest.fn().mockReturnValue({

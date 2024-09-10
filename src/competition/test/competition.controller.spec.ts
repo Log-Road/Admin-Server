@@ -1,7 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { CompetitionController } from "../competition.controller";
 import { JwtService } from "@nestjs/jwt";
-import { PrismaService as UserPrismaService } from "@iixanx/dias/src/prisma/prisma.service";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CompetitionService } from "../competition.service";
 import { BadRequestException, Logger } from "@nestjs/common";
@@ -64,7 +63,6 @@ describe("CompetitionController", () => {
       providers: [
         { provide: CompetitionService, useValue: serviceMock },
         { provide: PrismaService, useValue: prismaMock },
-        { provide: UserPrismaService, useValue: userPrismaMock },
         JwtService,
         Logger,
       ],

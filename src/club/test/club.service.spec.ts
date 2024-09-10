@@ -7,17 +7,16 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { PrismaService } from "../../prisma/prisma.service";
-import { PrismaService as UserPrismaService } from "@iixanx/dias/src/prisma/prisma.service";
 import { ConfigService } from "@nestjs/config";
 import { PostClubRequestDto } from "../dto/request/postClub.request.dto";
 import { GetClubRequestDto } from "../dto/request/getClub.request.dto";
 import { ModifyClubRequestDtoParams } from "../dto/request/modifyClub.request.dto";
 import { DeleteClubRequestDtoParams } from "../dto/request/deleteClub.request.dto";
+import { ROLE } from "../../types/role.type";
 
 describe("ClubService", () => {
   let service: ClubService;
   let prisma: PrismaService;
-  let userPrisma: UserPrismaService;
 
   let clubDatabase = {};
   let userDatabase = {};
@@ -75,10 +74,6 @@ describe("ClubService", () => {
         {
           provide: PrismaService,
           useValue: prismaMock,
-        },
-        {
-          provide: UserPrismaService,
-          useValue: userPrismaMock,
         },
         ConfigService,
       ],
@@ -145,7 +140,7 @@ describe("ClubService", () => {
         number: 3224,
         password: "dkjqo2jokdn92",
         provided: "local",
-        role: "Admin",
+        role: ROLE.Admin,
       },
     };
 

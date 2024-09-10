@@ -6,7 +6,6 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
-import { PrismaService as UserPrismaService } from "@iixanx/dias/src/prisma/prisma.service";
 import { PrismaService } from "../../prisma/prisma.service";
 import { PostCompetitionRequestDto } from "../dto/request/postCompetition.request.dto";
 import { PostAwardsRequestDto } from "../dto/request/postAwards.request.dto";
@@ -111,14 +110,12 @@ describe("CompetitionService", () => {
       },
     ),
   };
-  const userPrismaMock = {};
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CompetitionService,
         { provide: PrismaService, useValue: prismaMock },
-        { provide: UserPrismaService, useValue: userPrismaMock },
         JwtService,
         Logger,
       ],

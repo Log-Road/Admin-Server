@@ -2,7 +2,6 @@ import { Test, TestingModule } from "@nestjs/testing";
 import { ClubController } from "../club.controller";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "../../prisma/prisma.service";
-import { PrismaService as UserPrismaService } from "@iixanx/dias/src/prisma/prisma.service";
 import { Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { ClubService } from "../club.service";
@@ -10,7 +9,8 @@ import { PostClubRequestDto } from "../dto/request/postClub.request.dto";
 import { GetClubRequestDto } from "../dto/request/getClub.request.dto";
 import { ModifyClubRequestDtoParams } from "../dto/request/modifyClub.request.dto";
 import { DeleteClubRequestDtoParams } from "../dto/request/deleteClub.request.dto";
-import { JwtAuthGuard } from "@iixanx/dias/src/auth/strategies/jwt/jwt.auth.guard";
+import { JwtAuthGuard } from "../../guard/jwt/jwt.auth.guard";
+import { ROLE } from "../../types/role.type";
 
 describe("ClubController", () => {
   let controller: ClubController;
@@ -59,7 +59,6 @@ describe("ClubController", () => {
         },
         ConfigService,
         PrismaService,
-        UserPrismaService,
         JwtService,
         Logger,
         JwtAuthGuard,
@@ -100,7 +99,7 @@ describe("ClubController", () => {
         number: 3224,
         password: "dkjqo2jokdn92",
         provided: "local",
-        role: "Admin",
+        role: ROLE.Admin,
       },
     };
 

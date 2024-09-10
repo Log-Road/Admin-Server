@@ -1,7 +1,7 @@
 {
 	"scripts": {
 		"build" : "nest build",
-		"test:unit" : "jest",
+		"test:unit" : "jest --config jest.config.js",
 		"test:e2e" : ""
 	},
 	"dependencies": {
