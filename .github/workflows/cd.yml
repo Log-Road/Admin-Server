@@ -92,7 +92,6 @@ jobs:
           key: ${{ secrets.PROD_AWS_SSH_KEY }}
           host: ${{ secrets.PROD_AWS_HOST }}
           port: ${{ secrets.AWS_PORT }}
-          username: ubuntu
           script: |
             groupadd docker
             sudo usermod -aG docker $USER
