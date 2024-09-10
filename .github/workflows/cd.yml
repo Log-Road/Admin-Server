@@ -90,6 +90,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           key: ${{ secrets.PROD_AWS_SSH_KEY }}
+          host: ${{ secrets.PROD_AWS_HOST }}
           port: ${{ secrets.AWS_PORT }}
           username: ${{ secrets.PROD_AWS_USER }}
           script: |
