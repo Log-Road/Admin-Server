@@ -24,4 +24,4 @@ RUN cd ..
 
 EXPOSE 8002
 
-CMD [ "node", "main.js" ]
+CMD [ "pnpm", "start" ]
