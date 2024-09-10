@@ -52,7 +52,7 @@ jobs:
         run: |
           pnpm build
           cp -r src/prisma/client dist/
-          cp package.prod.json dist/package.json
+          cp package.json dist/package.json
 
       - name: docker
         run: docker build ./dist -t ${{secrets.DOCKERHUB_USERNAME}}/admin-server:latest -f ./dockerfile
