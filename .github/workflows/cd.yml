@@ -89,9 +89,10 @@ jobs:
       - name: EC2 Production Server Deploy
         uses: appleboy/ssh-action@master
         with:
-          key: ${{ secrets.PROD_AWS_SSH_KEY }}
           host: ${{ secrets.PROD_AWS_HOST }}
+          port: ${{ secrets.PROD_AWS_PORT }}
           username: ${{ secrets.PROD_AWS_USER }}
+          key: ${{ secrets.PROD_AWS_SSH_KEY }}
           script: |
             whoami
             groupadd docker
