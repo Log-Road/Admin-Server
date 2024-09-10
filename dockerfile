@@ -17,6 +17,7 @@ FROM set AS build
 
 COPY . .
 COPY .env .
+
 RUN export NODE_ENV=prod
 RUN cd ..
 
