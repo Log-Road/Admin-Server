@@ -50,10 +50,10 @@ jobs:
       - name: build
         run: |
           pnpm build
-          cp -r src/prisma dist/
-          cp .env dist/.env
-          cp package.json dist/package.json
-          cp pnpm-lock.yaml dist/pnpm-lock.yaml
+          cp -r src/prisma/client dist/
+          cp .env dist/
+          cp package.json dist/
+          cp pnpm-lock.yaml dist/
 
       - name: docker
         run: docker build --cache-from ${{ secrets.DOCKERHUB_USERNAME }}/admin-server:latest -t ${{secrets.DOCKERHUB_USERNAME}}/admin-server:latest -f ./dockerfile ./dist
