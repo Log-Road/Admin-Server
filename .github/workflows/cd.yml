@@ -83,8 +83,8 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.PROD_AWS_HOST }}
-          port: ${{ secrets.PROD_AWS_PORT }}
-          username: ${{ secrets.PROD_AWS_USER }}
+          port: ${{ secrets.AWS_PORT }}
+          username: ${{ secrets.PROD_AWS_USERNAME }}
           key: ${{ secrets.PROD_AWS_SSH_KEY }}
           script: |
             sudo groupadd docker
