@@ -5,10 +5,11 @@ import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "../../prisma/prisma.service";
 import {
   ExecutionContext,
+  Inject,
   NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
-import { ROLE } from "../../types/role.type";
+import { ROLE } from "../../types/proto.type";
 
 describe("TokenGuard - HTTP", () => {
   let guard: JwtAuthGuard;
@@ -138,7 +139,7 @@ describe("TokenGuard - HTTP", () => {
     }));
     jest.spyOn(prismaMock, "findUserById").mockReturnValue(null);
 
-    // Line 142 ~ 145 : gRPC로 인해 기존 테스트 동작 변경이 예상되어 임시 조치
+    // Line 142 ~ 145 : 로 인해 기존 테스트 동작 변경이 예상되어 임시 조치
     jest.spyOn(guard, "canActivate").mockImplementationOnce(async () => {
       prismaMock.findUserById("1");
       throw new NotFoundException("존재하지 않는 유저");

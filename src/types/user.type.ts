@@ -1,6 +1,6 @@
-import { ROLE } from "./role.type";
+import { user, ROLE } from './proto.type';
 
-export type User = {
+export class User implements user {
   id: string;
   userId: string;
   name: string;

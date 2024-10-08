@@ -12,7 +12,7 @@ import { PostClubRequestDto } from "../dto/request/postClub.request.dto";
 import { GetClubRequestDto } from "../dto/request/getClub.request.dto";
 import { ModifyClubRequestDtoParams } from "../dto/request/modifyClub.request.dto";
 import { DeleteClubRequestDtoParams } from "../dto/request/deleteClub.request.dto";
-import { ROLE } from "../../types/role.type";
+import { ROLE } from "../../types/proto.type";
 
 describe("ClubService", () => {
   let service: ClubService;

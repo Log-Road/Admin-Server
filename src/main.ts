@@ -4,9 +4,7 @@ import { ValidationPipe, Logger } from "@nestjs/common";
 import { HttpExceptionFilter } from "./utils/http.exception.filter";
 import { configDotenv } from "dotenv";
 import { WinstonModule } from "nest-winston";
-import { AdminValidateGuard } from "./guard/adminValidator/adminValidator.guard";
 import { WinstonInstance } from "utils/winston";
-import { JwtAuthGuard } from "guard/jwt/jwt.auth.guard";
 
 async function bootstrap() {
   configDotenv({
@@ -33,7 +31,7 @@ async function bootstrap() {
       disableErrorMessages: true,
     }),
   );
-  app.useGlobalGuards(new AdminValidateGuard(new JwtAuthGuard()));
+  app.useGlobalGuards();
 
   await app.listen(Number(process.env.PORT ?? "8082"), () => {
     logger.log(`ADMIN-SERVER HAD STARTED`);

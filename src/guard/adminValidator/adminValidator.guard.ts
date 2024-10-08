@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { JwtAuthGuard } from "../jwt/jwt.auth.guard";
-import { ROLE } from "../../types/role.type";
+import { ROLE } from "../../types/proto.type";
 
 @Injectable()
 export class AdminValidateGuard implements CanActivate {

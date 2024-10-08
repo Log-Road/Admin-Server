@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { ROLE } from "../../types/role.type";
+import { ROLE } from "../../types/proto.type";
 import { JwtAuthGuard } from "../jwt/jwt.auth.guard";
 import { configDotenv } from "dotenv";
 

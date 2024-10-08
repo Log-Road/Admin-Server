@@ -13,7 +13,6 @@ describe("CompetitionController", () => {
   let controller: CompetitionController;
 
   const prismaMock = {};
-  const userPrismaMock = {};
 
   const serviceMock = {
     postCompetition: jest.fn(() => {
