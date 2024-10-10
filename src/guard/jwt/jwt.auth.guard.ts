@@ -24,7 +24,7 @@ export class JwtAuthGuard implements CanActivate {
     if (!token.includes(" ")) throw new UnauthorizedException("토큰 형식 오류");
 
     await axios
-      .post(`http://localhost:${process.env.DIAS_PORT}/auth/user`, {
+      .post(`http://${process.env.LOCALHOST}:${process.env.DIAS_PORT}/auth/user`, {
         headers: req.headers,
       })
       .then((res) => {
