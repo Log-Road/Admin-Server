@@ -29,7 +29,6 @@ import { GuardModule } from "./guard/guard.module";
     // ]),
     ClubModule,
     CompetitionModule,
-    Logger,
     GuardModule,
   ],
   controllers: [],
