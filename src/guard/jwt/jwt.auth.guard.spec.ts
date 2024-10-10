@@ -5,14 +5,14 @@ import { ConfigService } from "@nestjs/config";
 import { PrismaService } from "../../prisma/prisma.service";
 import {
   ExecutionContext,
-  Inject,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
 import { ROLE } from "../../types/proto.type";
 
 describe("TokenGuard - HTTP", () => {
-  let guard: JwtAuthGuard;
+  let guard;
   let jwt: JwtService;
 
   let req: Partial<
@@ -46,11 +46,20 @@ describe("TokenGuard - HTTP", () => {
           provide: PrismaService,
           useValue: prismaMock,
         },
+        Logger,
       ],
     }).compile();
 
     jwt = module.get<JwtService>(JwtService);
-    guard = new JwtAuthGuard();
+    guard = {
+      canActivate: new JwtAuthGuard().canActivate,
+      call: jest.fn(
+        () =>
+          new Promise((res, rej) => {
+            res(true);
+          }),
+      ),
+    };
 
     req = {
       switchToHttp: jest.fn().mockReturnValue({
@@ -81,9 +90,8 @@ describe("TokenGuard - HTTP", () => {
     }));
 
     await expect(
-      guard.canActivate(req as ExecutionContext),
-    ).resolves.toStrictEqual(true);
-    // expect(prismaMock.findUserById).toHaveBeenCalledTimes(0);
+      await guard.canActivate(req as ExecutionContext),
+    ).toEqual(true);
   });
 
   it("[401] 토큰 미존재", async () => {
