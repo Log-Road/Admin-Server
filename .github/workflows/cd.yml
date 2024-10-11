@@ -91,7 +91,7 @@ jobs:
             sudo usermod -aG docker $USER
             echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
             sudo docker stop $(sudo docker ps --filter "publish=${{ secrets.PORT }}" -q)
-            sudo docker rm -f $(sudo docker ps -a -f status=Created -q)
+            sudo docker rm -f $(sudo docker ps -a -f status=exited -q)
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/admin-server:latest
             sudo docker run -d -p ${{ secrets.PORT }}:${{ secrets.PORT }} ${{ secrets.DOCKERHUB_USERNAME }}/admin-server:latest
             sudo docker image prune -f
