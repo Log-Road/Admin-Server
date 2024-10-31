@@ -115,12 +115,12 @@ enum ROLE {
   Admin
 }
 
-model User {
+view User {
   userId            String @id @unique @map("user_id")
   userStringId      String @map("user_string_id")
   userName          String @map("user_name")
   userRole          ROLE   @map("user_role")
   userStudentNumber Int    @map("user_student_number")
 
-  @@map("User")
+  @@map("foreign_user")
 }

@@ -49,6 +49,26 @@ describe("CompetitionController", () => {
         status: COMPETITION_STATUS.ONGOING,
       };
     }),
+    getRecentCompetitions: jest.fn(() => {
+      return {
+        list: [
+          {
+            id: "1",
+            name: "Test1_PENDING_DSM",
+            status: "PENDING_AWARD",
+            startDate: new Date("2024-08-27T00:00:00.000Z").toISOString(),
+            endDate: new Date("2024-08-30T23:59:59.000Z").toISOString(),
+          },
+          {
+            id: "2",
+            name: "Test2_AWARD_DSM",
+            status: "PENDING_AWARD",
+            startDate: new Date("2024-08-27T00:00:00.000Z").toISOString(),
+            endDate: new Date("2024-08-30T23:59:59.000Z").toISOString(),
+          },
+        ],
+      };
+    }),
     getNonVoterList: jest.fn(() => {
       return {
         list: [
@@ -229,6 +249,37 @@ describe("CompetitionController", () => {
         new BadRequestException("Must included parameter as id"),
       );
       expect(serviceMock.getCompetition).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  describe("GetRecentCompetition", () => {
+    it("[200]", async () => {
+      const res = await controller.getRecentCompetitions();
+
+      expect(serviceMock.getRecentCompetitions).toHaveBeenCalledTimes(1);
+      expect(serviceMock.getRecentCompetitions).toHaveBeenCalledWith();
+      expect(res).toEqual({
+        data: {
+          list: [
+            {
+              id: "1",
+              name: "Test1_PENDING_DSM",
+              status: "PENDING_AWARD",
+              startDate: new Date("2024-08-27T00:00:00.000Z").toISOString(),
+              endDate: new Date("2024-08-30T23:59:59.000Z").toISOString(),
+            },
+            {
+              id: "2",
+              name: "Test2_AWARD_DSM",
+              status: "PENDING_AWARD",
+              startDate: new Date("2024-08-27T00:00:00.000Z").toISOString(),
+              endDate: new Date("2024-08-30T23:59:59.000Z").toISOString(),
+            },
+          ],
+        },
+        statusCode: 200,
+        statusMsg: "",
+      });
     });
   });
 

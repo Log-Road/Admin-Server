@@ -186,6 +186,21 @@ export class PrismaService
     }
   }
 
+  async findManyCompetitionPendingAward() {
+    try {
+      const theseComp = await this.contests.findMany({
+        where: {
+          status: "PENDING_AWARD",
+        },
+      });
+
+      return theseComp;
+    } catch (e) {
+      this.logger.error(e);
+      throw new InternalServerErrorException(e);
+    }
+  }
+
   async findNonVoterList(id: string, category?: string) {
     try {
       const thisCompetition = await this.contests.findUnique({
@@ -205,11 +220,11 @@ export class PrismaService
       >`
         SELECT "u"."user_id" "userId", "u"."user_name" "userName", "u"."user_student_number" "userStudentNumber", "u"."user_role"::TEXT "userRole"
         FROM (
-          SELECT "v"."userId" "userId"
-          FROM "data"."Vote" "v"
-          WHERE "v"."contestId" = ${id}
+          SELECT "v"."user_id" "userId"
+          FROM "Vote" "v"
+          WHERE "v"."contest_id" = ${id}
         ) "v"
-        RIGHT JOIN "data"."foreign_user" "u"
+        RIGHT JOIN "foreign_user" "u"
         ON "v"."userId" = "u"."user_id"
         WHERE "v"."userId" IS NULL AND "u"."user_role"::TEXT IN ('Student', 'Teacher')
         ORDER BY "userRole", "userStudentNumber", "userId";
