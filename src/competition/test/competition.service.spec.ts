@@ -1,6 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { CompetitionService } from "../competition.service";
 import {
+  BadRequestException,
   InternalServerErrorException,
   Logger,
   NotFoundException,
@@ -148,6 +149,13 @@ describe("CompetitionService", () => {
         };
       },
     ),
+    deleteCompetition: jest.fn(async (id: string) => {
+      if (competitionDatabase[id] == undefined) return undefined;
+      else {
+        delete competitionDatabase[id];
+        return id;
+      }
+    }),
   };
 
   beforeEach(async () => {
@@ -180,12 +188,7 @@ describe("CompetitionService", () => {
     voteDatabase = {};
     foreignUserDatabase = {};
 
-    prismaMock.saveCompetition.mockClear();
-    prismaMock.saveAwards.mockClear();
-    prismaMock.saveWinner.mockClear();
-    prismaMock.findCompetitionById.mockClear();
-    prismaMock.findCompetitionList.mockClear();
-    prismaMock.patchCompetition.mockClear();
+    jest.clearAllMocks();
   });
 
   describe("PostCompetition", () => {
@@ -623,6 +626,70 @@ describe("CompetitionService", () => {
       expect(prismaMock.findCompetitionById).toHaveBeenCalledWith(id);
       expect(prismaMock.patchCompetition).toHaveBeenCalledTimes(1);
       expect(prismaMock.patchCompetition).toHaveBeenCalledWith(id, request);
+    });
+  });
+
+  describe("DeleteCompetition", () => {
+    const id = "1";
+
+    it("[204]", async () => {
+      competitionDatabase["1"] = {
+        id: "1",
+        name: "test",
+        startDate: new Date("2024-08-19T00:00:00Z"),
+        endDate: new Date("2024-08-21T23:59:59Z"),
+        purpose: "학생들의 협업 능력 향상 및 코드 검수 정도 확인",
+        audience: "대덕소프트웨어마이스터고등학교 2학년",
+        place: "청죽관",
+        status: "ONGOING",
+      };
+
+      const res = await service.deleteCompetition(id);
+      expect(prismaMock.findCompetitionById).toHaveBeenCalledTimes(1);
+      expect(prismaMock.findCompetitionById).toHaveBeenCalledWith(id);
+      expect(prismaMock.deleteCompetition).toHaveBeenCalledTimes(1);
+      expect(prismaMock.deleteCompetition).toHaveBeenCalledWith(id);
+      expect(res).toEqual({});
+    });
+
+    it("[400]", async () => {
+      competitionDatabase["1"] = {
+        id: "1",
+        name: "test",
+        startDate: new Date("2024-08-19T00:00:00Z"),
+        endDate: new Date("2024-08-21T23:59:59Z"),
+        purpose: "학생들의 협업 능력 향상 및 코드 검수 정도 확인",
+        audience: "대덕소프트웨어마이스터고등학교 2학년",
+        place: "청죽관",
+        status: "IN_PROGRESS",
+      };
+
+      await expect(
+        async () => await service.deleteCompetition(id),
+      ).rejects.toThrow(new BadRequestException());
+      expect(prismaMock.findCompetitionById).toHaveBeenCalledTimes(1);
+      expect(prismaMock.findCompetitionById).toHaveBeenCalledWith(id);
+      expect(prismaMock.deleteCompetition).toHaveBeenCalledTimes(0);
+    });
+
+    it("[404]", async () => {
+      competitionDatabase["2"] = {
+        id: "2",
+        name: "test",
+        startDate: new Date("2024-08-19T00:00:00Z"),
+        endDate: new Date("2024-08-21T23:59:59Z"),
+        purpose: "학생들의 협업 능력 향상 및 코드 검수 정도 확인",
+        audience: "대덕소프트웨어마이스터고등학교 2학년",
+        place: "청죽관",
+        status: "IN_PROGRESS",
+      };
+
+      await expect(
+        async () => await service.deleteCompetition(id),
+      ).rejects.toThrow(new NotFoundException());
+      expect(prismaMock.findCompetitionById).toHaveBeenCalledTimes(1);
+      expect(prismaMock.findCompetitionById).toHaveBeenCalledWith(id);
+      expect(prismaMock.deleteCompetition).toHaveBeenCalledTimes(0);
     });
   });
 });

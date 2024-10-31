@@ -40,7 +40,7 @@ model Projects {
   contestId    String         @map("contest_id")
   videoLink    String         @map("video_link")
   Like         Like[]
-  contest      Contests       @relation(fields: [contestId], references: [id])
+  contest      Contests       @relation(fields: [contestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   Vote         Vote[]
 }
 
@@ -49,7 +49,7 @@ model Awards {
   name      String
   count     Int
   contestId String   @map("contest_id")
-  contest   Contests @relation(fields: [contestId], references: [id])
+  contest   Contests @relation(fields: [contestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   Winner    Winner[]
 }
 
@@ -57,8 +57,8 @@ model Vote {
   contestId String   @map("contest_id")
   projectId String   @map("project_id")
   userId    String   @map("user_id")
-  contest   Contests @relation(fields: [contestId], references: [id])
-  project   Projects @relation(fields: [projectId], references: [id])
+  contest   Contests @relation(fields: [contestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  project   Projects @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([projectId, userId])
 }
@@ -66,7 +66,7 @@ model Vote {
 model Like {
   projectId String   @map("project_id")
   userId    String   @map("user_id")
-  project   Projects @relation(fields: [projectId], references: [id])
+  project   Projects @relation(fields: [projectId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@id([projectId, userId])
 }
@@ -82,8 +82,8 @@ model Winner {
   awardId   String   @map("award_id")
   contestId String   @map("contest_id")
   userId    String   @map("user_id")
-  award     Awards   @relation(fields: [awardId], references: [id])
-  contest   Contests @relation(fields: [contestId], references: [id])
+  award     Awards   @relation(fields: [awardId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  contest   Contests @relation(fields: [contestId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([awardId, userId])
 }

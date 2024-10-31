@@ -2,6 +2,7 @@ import { GetNonVoterListRequestDto } from "./dto/request/getNonVoterList.request
 import { PatchCompetitionRequestDto } from "./dto/request/patchCompetition.request.dto";
 import { PostAwardsRequestDto } from "./dto/request/postAwards.request.dto";
 import { PostCompetitionRequestDto } from "./dto/request/postCompetition.request.dto";
+import { DeleteCompetitionResponseDto } from "./dto/response/deleteCompetition.response.dto";
 import { GetCompetitionResponseDto } from "./dto/response/getCompetition.response.dto";
 import { GetCompetitionListResponseDto } from "./dto/response/getCompetitionList.response.dto";
 import { GetNonVoterListResponseDto } from "./dto/response/getNonVoterList.response.dto";
@@ -30,4 +31,7 @@ export interface ICompetitionService {
     id: string,
     request: PatchCompetitionRequestDto,
   ): Promise<PatchCompetitionResponseDto>;
+  deleteCompetition(
+    id: string,
+  ): Promise<DeleteCompetitionResponseDto>;
 }

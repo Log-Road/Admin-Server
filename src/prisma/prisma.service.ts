@@ -300,4 +300,17 @@ export class PrismaService
       throw new InternalServerErrorException(e);
     }
   }
+
+  async deleteCompetition(competitionId: string) {
+    try {
+      return await this.contests.delete({
+        where: {
+          id: competitionId,
+        },
+      });
+    } catch (e) {
+      this.logger.error(e);
+      throw new InternalServerErrorException(e);
+    }
+  }
 }

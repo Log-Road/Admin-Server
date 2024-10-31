@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Logger,
@@ -26,9 +27,10 @@ import { PatchCompetitionResponseDto } from "./dto/response/patchCompetition.res
 import { PostAwardsResponseDto } from "./dto/response/postAwards.response.dto";
 import { PostCompetitionResponseDto } from "./dto/response/postCompetition.response.dto";
 import { CompetitionService } from "./competition.service";
+import { DeleteCompetitionResponseDto } from "./dto/response/deleteCompetition.response.dto";
 
 @Controller("competition")
-export class CompetitionController {
+export class CompetitionController implements ICompetitionController {
   constructor(
     private service: CompetitionService,
     @Inject(Logger) private logger: Logger,
@@ -100,7 +102,7 @@ export class CompetitionController {
       data,
       statusCode: 200,
       statusMsg: "",
-    }
+    };
   }
 
   @Get(":page")
@@ -131,6 +133,19 @@ export class CompetitionController {
     return {
       data,
       statusCode: 200,
+      statusMsg: "",
+    };
+  }
+
+  @Delete(":id")
+  async deleteCompetition(
+    @Param() id: string,
+  ): Promise<Res<DeleteCompetitionResponseDto>> {
+    const data = await this.service.deleteCompetition(id);
+
+    return {
+      data,
+      statusCode: 204,
       statusMsg: "",
     };
   }

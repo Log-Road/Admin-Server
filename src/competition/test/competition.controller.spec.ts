@@ -72,6 +72,9 @@ describe("CompetitionController", () => {
         id: "1",
       };
     }),
+    deleteCompetition: jest.fn(() => {
+      return {};
+    }),
   };
 
   beforeEach(async () => {
@@ -261,20 +264,6 @@ describe("CompetitionController", () => {
         statusMsg: "",
       });
     });
-
-    // it("[400]", async () => {
-    //   const request = {
-    //     id: "",
-    //     category: ""
-    //   };
-
-    //   await expect(
-    //     async () => await controller.getNonVoterList(request),
-    //   ).rejects.toThrow(
-    //     new BadRequestException(""),
-    //   );
-    //   expect(serviceMock.getNonVoterList).toHaveBeenCalledTimes(0);
-    // })
   });
 
   describe("PatchCompetition", () => {
@@ -299,6 +288,20 @@ describe("CompetitionController", () => {
       });
       expect(serviceMock.patchCompetition).toHaveBeenCalledTimes(1);
       expect(serviceMock.patchCompetition).toHaveBeenCalledWith(id, request);
+    });
+  });
+
+  describe("DeleteCompetition", () => {
+    const id = "1";
+    it("[204]", async () => {
+      const res = await controller.deleteCompetition(id);
+      expect(res).toEqual({
+        data: {},
+        statusCode: 204,
+        statusMsg: "",
+      });
+      expect(serviceMock.deleteCompetition).toHaveBeenCalledTimes(1);
+      expect(serviceMock.deleteCompetition).toHaveBeenCalledWith(id);
     });
   });
 });

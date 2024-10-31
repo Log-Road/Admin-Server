@@ -1,4 +1,10 @@
-import { Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from "@nestjs/common";
 import { ICompetitionService } from "./competition.service.interface";
 import { GetNonVoterListRequestDto } from "./dto/request/getNonVoterList.request.dto";
 import { PatchCompetitionRequestDto } from "./dto/request/patchCompetition.request.dto";
@@ -16,6 +22,7 @@ import { PatchCompetitionResponseDto } from "./dto/response/patchCompetition.res
 import { PostAwardsResponseDto } from "./dto/response/postAwards.response.dto";
 import { PostCompetitionResponseDto } from "./dto/response/postCompetition.response.dto";
 import { PrismaService } from "../prisma/prisma.service";
+import { DeleteCompetitionResponseDto } from "./dto/response/deleteCompetition.response.dto";
 
 @Injectable()
 export class CompetitionService implements ICompetitionService {
@@ -135,5 +142,18 @@ export class CompetitionService implements ICompetitionService {
     await this.prisma.patchCompetition(id, request);
 
     return { id };
+  }
+
+  async deleteCompetition(
+    id: string,
+  ): Promise<DeleteCompetitionResponseDto> {
+    const thisComp = await this.prisma.findCompetitionById(id);
+
+    if (!thisComp) throw new NotFoundException();
+    if (thisComp.status != "ONGOING") throw new BadRequestException();
+
+    await this.prisma.deleteCompetition(id);
+
+    return {};
   }
 }
