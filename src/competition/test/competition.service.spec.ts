@@ -97,6 +97,11 @@ describe("CompetitionService", () => {
     findCompetitionById: jest.fn(async (id: string) => {
       return competitionDatabase[id];
     }),
+    findManyCompetitionPendingAward: jest.fn(async () => {
+      return Object.values(competitionDatabase).filter(
+        (e) => e.status == "PENDING_AWARD",
+      );
+    }),
     findCompetitionList: jest.fn(async (page: number) => {
       return Object.values(competitionDatabase).slice(page, page + 15);
     }),
@@ -444,6 +449,80 @@ describe("CompetitionService", () => {
       }).rejects.toThrow(new InternalServerErrorException());
       expect(prismaMock.findCompetitionById).toHaveBeenCalledTimes(1);
       expect(prismaMock.findCompetitionById).toHaveBeenCalledWith(request);
+    });
+  });
+
+  describe("GetRecentCompetition", () => {
+    it("[200]", async () => {
+      competitionDatabase = {
+        "0": {
+          id: "0",
+          name: "Test0_ONGOING_DSM",
+          status: "ONGOING",
+          startDate: new Date("2024-08-27T00:00:00.000Z"),
+          endDate: new Date("2024-08-30T23:59:59.000Z"),
+          purpose:
+            "학생들의 알고리즘 풀이 능력 향상 및 중학생 대상으로 본교 홍보",
+          audience: "전국 중학생 중 본 대회의 예선 통과자",
+          place: "대덕소프트웨어마이스터고등학교 소프트웨어개발 1 ~ 3실",
+        },
+        "1": {
+          id: "1",
+          name: "Test1_PENDING_DSM",
+          status: "PENDING_AWARD",
+          startDate: new Date("2024-08-27T00:00:00.000Z"),
+          endDate: new Date("2024-08-30T23:59:59.000Z"),
+          purpose:
+            "학생들의 알고리즘 풀이 능력 향상 및 중학생 대상으로 본교 홍보",
+          audience: "전국 중학생 중 본 대회의 예선 통과자",
+          place: "대덕소프트웨어마이스터고등학교 소프트웨어개발 1 ~ 3실",
+        },
+        "2": {
+          id: "2",
+          name: "Test2_AWARD_DSM",
+          status: "PENDING_AWARD",
+          startDate: new Date("2024-08-27T00:00:00.000Z"),
+          endDate: new Date("2024-08-30T23:59:59.000Z"),
+          purpose:
+            "학생들의 알고리즘 풀이 능력 향상 및 중학생 대상으로 본교 홍보",
+          audience: "전국 중학생 중 본 대회의 예선 통과자",
+          place: "대덕소프트웨어마이스터고등학교 소프트웨어개발 1 ~ 3실",
+        },
+        "3": {
+          id: "3",
+          name: "Test3_CLOSED_BETA_DSM",
+          status: "CLOSED",
+          startDate: new Date("2024-08-27T00:00:00.000Z"),
+          endDate: new Date("2024-08-30T23:59:59.000Z"),
+          purpose:
+            "학생들의 알고리즘 풀이 능력 향상 및 중학생 대상으로 본교 홍보",
+          audience: "전국 중학생 중 본 대회의 예선 통과자",
+          place: "대덕소프트웨어마이스터고등학교 소프트웨어개발 1 ~ 3실",
+        },
+      };
+
+      const res = await service.getRecentCompetitions();
+
+      expect(prismaMock.findManyCompetitionPendingAward).toHaveBeenCalledTimes(1);
+      expect(prismaMock.findManyCompetitionPendingAward).toHaveBeenCalledWith();
+      expect(res).toEqual({
+        list: [
+          {
+            id: "1",
+            name: "Test1_PENDING_DSM",
+            status: "PENDING_AWARD",
+            startDate: new Date("2024-08-27T00:00:00.000Z").toISOString(),
+            endDate: new Date("2024-08-30T23:59:59.000Z").toISOString(),
+          },
+          {
+            id: "2",
+            name: "Test2_AWARD_DSM",
+            status: "PENDING_AWARD",
+            startDate: new Date("2024-08-27T00:00:00.000Z").toISOString(),
+            endDate: new Date("2024-08-30T23:59:59.000Z").toISOString(),
+          },
+        ],
+      });
     });
   });
 

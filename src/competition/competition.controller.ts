@@ -67,7 +67,13 @@ export class CompetitionController implements ICompetitionController {
   async getRecentCompetitions(): Promise<
     Res<GetRecentCompetitionsResponseDto>
   > {
-    throw new Error("Method not implemented.");
+    const data = await this.service.getRecentCompetitions();
+
+    return {
+      data,
+      statusCode: 200,
+      statusMsg: "",
+    };
   }
 
   @Get("inform/:id")

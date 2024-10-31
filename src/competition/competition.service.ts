@@ -96,7 +96,19 @@ export class CompetitionService implements ICompetitionService {
   }
 
   async getRecentCompetitions(): Promise<GetRecentCompetitionsResponseDto> {
-    throw new Error("Method not implemented.");
+    const pendingAwards = (
+      await this.prisma.findManyCompetitionPendingAward()
+    ).map((e) => ({
+      id: e.id,
+      name: e.name,
+      startDate: e.startDate.toISOString(),
+      endDate: e.endDate.toISOString(),
+      status: e.status,
+    }));
+
+    return {
+      list: pendingAwards,
+    };
   }
 
   async getCompetition(id: string): Promise<GetCompetitionResponseDto> {
@@ -144,9 +156,7 @@ export class CompetitionService implements ICompetitionService {
     return { id };
   }
 
-  async deleteCompetition(
-    id: string,
-  ): Promise<DeleteCompetitionResponseDto> {
+  async deleteCompetition(id: string): Promise<DeleteCompetitionResponseDto> {
     const thisComp = await this.prisma.findCompetitionById(id);
 
     if (!thisComp) throw new NotFoundException();
