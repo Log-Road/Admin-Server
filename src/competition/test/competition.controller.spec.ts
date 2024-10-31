@@ -49,6 +49,24 @@ describe("CompetitionController", () => {
         status: COMPETITION_STATUS.ONGOING,
       };
     }),
+    getNonVoterList: jest.fn(() => {
+      return {
+        list: [
+          {
+            id: "5fe287b2-cf86-4bda-b1d8-d633f2c53324",
+            name: "홍길동",
+            number: 2468,
+            category: "Student",
+          },
+          {
+            id: "95d1e309-0397-40f4-a852-3c16f3aka2df",
+            name: "청도서",
+            number: null,
+            category: "Teacher",
+          },
+        ],
+      };
+    }),
     patchCompetition: jest.fn(() => {
       return {
         id: "1",
@@ -73,6 +91,7 @@ describe("CompetitionController", () => {
     serviceMock.postAwards.mockClear();
     serviceMock.getCompetitionList.mockClear();
     serviceMock.getCompetition.mockClear();
+    serviceMock.getNonVoterList.mockClear();
   });
 
   describe("PostCompetition", () => {
@@ -208,6 +227,54 @@ describe("CompetitionController", () => {
       );
       expect(serviceMock.getCompetition).toHaveBeenCalledTimes(0);
     });
+  });
+
+  describe("GetNonVoterList", () => {
+    const request = {
+      id: "b6ee2cd2-4596-47ee-b332-de87e1p39e80",
+      category: "Student",
+    };
+
+    it("[200]", async () => {
+      const res = await controller.getNonVoterList(request);
+
+      expect(serviceMock.getNonVoterList).toHaveBeenCalledTimes(1);
+      expect(serviceMock.getNonVoterList).toHaveBeenCalledWith(request);
+      expect(res).toEqual({
+        data: {
+          list: [
+            {
+              id: "5fe287b2-cf86-4bda-b1d8-d633f2c53324",
+              name: "홍길동",
+              number: 2468,
+              category: "Student",
+            },
+            {
+              id: "95d1e309-0397-40f4-a852-3c16f3aka2df",
+              name: "청도서",
+              number: null,
+              category: "Teacher",
+            },
+          ],
+        },
+        statusCode: 200,
+        statusMsg: "",
+      });
+    });
+
+    // it("[400]", async () => {
+    //   const request = {
+    //     id: "",
+    //     category: ""
+    //   };
+
+    //   await expect(
+    //     async () => await controller.getNonVoterList(request),
+    //   ).rejects.toThrow(
+    //     new BadRequestException(""),
+    //   );
+    //   expect(serviceMock.getNonVoterList).toHaveBeenCalledTimes(0);
+    // })
   });
 
   describe("PatchCompetition", () => {

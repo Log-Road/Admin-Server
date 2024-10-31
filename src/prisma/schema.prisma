@@ -1,7 +1,8 @@
 generator client {
-  provider      = "prisma-client-js"
-  output        = "./client"
-  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+  provider        = "prisma-client-js"
+  output          = "./client"
+  previewFeatures = ["views"]
+  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -10,83 +11,81 @@ datasource db {
 }
 
 model Contests {
-  id         String             @id() @default(uuid())
-  name       String
-  start_date DateTime           @default(now())
-  end_date   DateTime           @default(now())
-  status     COMPETITION_STATUS @default(ONGOING)
-  place      String
-  purpose    String
-  audience   String
-  Awards     Awards[]
-  Projects   Projects[]
-  Vote       Vote[]
-
-  Winner Winner[]
+  id        String             @id @default(uuid())
+  name      String
+  status    COMPETITION_STATUS @default(ONGOING)
+  place     String
+  purpose   String
+  audience  String
+  endDate   DateTime           @default(now()) @map("end_date")
+  startDate DateTime           @default(now()) @map("start_date")
+  Awards    Awards[]
+  Projects  Projects[]
+  Vote      Vote[]
+  Winner    Winner[]
 }
 
 model Projects {
-  id            String         @id() @default(uuid())
-  contest_id    String
-  contest       Contests       @relation(references: [id], fields: [contest_id])
-  name          String
-  image         String
-  members       String[]
-  skills        String[]
-  status        PROJECT_STATUS
-  auth_category CATEGORY
-  introduction  String
-  description   String
-  video_link    String
-  place         String
-  Vote          Vote[]
-  Like          Like[]
-  CreatedAt     DateTime       @default(now())
+  id           String         @id @default(uuid())
+  name         String
+  image        String
+  members      String[]
+  skills       String[]
+  status       PROJECT_STATUS
+  introduction String
+  description  String
+  place        String
+  CreatedAt    DateTime       @default(now())
+  authCategory CATEGORY       @map("auth_ategory")
+  contestId    String         @map("contest_id")
+  videoLink    String         @map("video_link")
+  Like         Like[]
+  contest      Contests       @relation(fields: [contestId], references: [id])
+  Vote         Vote[]
 }
 
 model Awards {
-  id         String   @id() @default(uuid())
-  contest_id String
-  contest    Contests @relation(references: [id], fields: [contest_id])
-  name       String
-  count      Int
-
-  Winner Winner[]
+  id        String   @id @default(uuid())
+  name      String
+  count     Int
+  contestId String   @map("contest_id")
+  contest   Contests @relation(fields: [contestId], references: [id])
+  Winner    Winner[]
 }
 
 model Vote {
-  contest_id String
-  project_id String
-  user_id    String
-  contest    Contests @relation(references: [id], fields: [contest_id])
-  project    Projects @relation(references: [id], fields: [project_id])
+  contestId String   @map("contest_id")
+  projectId String   @map("project_id")
+  userId    String   @map("user_id")
+  contest   Contests @relation(fields: [contestId], references: [id])
+  project   Projects @relation(fields: [projectId], references: [id])
 
-  @@id([project_id, user_id])
+  @@id([projectId, userId])
 }
 
 model Like {
-  project_id String
-  user_id    String
-  project    Projects @relation(references: [id], fields: [project_id])
+  projectId String   @map("project_id")
+  userId    String   @map("user_id")
+  project   Projects @relation(fields: [projectId], references: [id])
 
-  @@id([project_id, user_id])
+  @@id([projectId, userId])
 }
 
 model Club {
-  club_id   String  @id @default(uuid())
-  club_name String  @unique
-  is_active Boolean @default(true)
+  clubId   String  @id @default(uuid()) @map("club_id")
+  clubName String  @unique @map("club_name")
+  isActive Boolean @default(true) @map("is_active")
 }
 
 model Winner {
-  id         String   @id @default(uuid())
-  award_id   String
-  contest_id String
-  user_id    String
-  award      Awards   @relation(references: [id], fields: [award_id])
-  contest    Contests @relation(references: [id], fields: [contest_id])
+  id        String   @id @default(uuid())
+  awardId   String   @map("award_id")
+  contestId String   @map("contest_id")
+  userId    String   @map("user_id")
+  award     Awards   @relation(fields: [awardId], references: [id])
+  contest   Contests @relation(fields: [contestId], references: [id])
 
-  @@unique([award_id, user_id])
+  @@unique([awardId, userId])
 }
 
 enum COMPETITION_STATUS {
@@ -108,4 +107,20 @@ enum CATEGORY {
   PERSONAL
   TEAM
   CLUB
+}
+
+enum ROLE {
+  Student
+  Teacher
+  Admin
+}
+
+model User {
+  userId            String @id @unique @map("user_id")
+  userStringId      String @map("user_string_id")
+  userName          String @map("user_name")
+  userRole          ROLE   @map("user_role")
+  userStudentNumber Int    @map("user_student_number")
+
+  @@map("User")
 }

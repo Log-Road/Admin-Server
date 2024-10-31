@@ -5,18 +5,14 @@ import {
   IsOptional,
   IsString,
 } from "class-validator";
+import { ROLE } from "prisma/client";
 
 export class GetNonVoterListResponseDto {
   @IsArray()
   list: List[];
 }
 
-enum CATEGORY {
-  STUDENT = "Student",
-  TEACHER = "Teacher",
-}
-
-class List {
+export class List {
   @IsString()
   id: string;
 
@@ -27,6 +23,6 @@ class List {
   @IsNumber()
   number?: number;
 
-  @IsEnum(CATEGORY)
-  category: CATEGORY;
+  @IsEnum(ROLE)
+  category: ROLE;
 }

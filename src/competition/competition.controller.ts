@@ -6,6 +6,7 @@ import {
   Inject,
   Logger,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -27,7 +28,7 @@ import { PostCompetitionResponseDto } from "./dto/response/postCompetition.respo
 import { CompetitionService } from "./competition.service";
 
 @Controller("competition")
-export class CompetitionController implements ICompetitionController {
+export class CompetitionController {
   constructor(
     private service: CompetitionService,
     @Inject(Logger) private logger: Logger,
@@ -56,24 +57,6 @@ export class CompetitionController implements ICompetitionController {
     return {
       data,
       statusCode: 201,
-      statusMsg: "",
-    };
-  }
-
-  @Get(":page")
-  async getCompetitionList(
-    @Param("page") page: string,
-  ): Promise<Res<GetCompetitionListResponseDto>> {
-    if (!page) page = "0";
-    if (isNaN(Number(page)) || Number(page) < 0) {
-      throw new BadRequestException("Parameter have to valid");
-    }
-
-    const data = await this.service.getCompetitionList(page);
-
-    return {
-      data,
-      statusCode: 200,
       statusMsg: "",
     };
   }
@@ -107,11 +90,35 @@ export class CompetitionController implements ICompetitionController {
     throw new Error("Method not implemented.");
   }
 
-  @Get("list?")
+  @Get("list")
   async getNonVoterList(
     @Query() request: GetNonVoterListRequestDto,
   ): Promise<Res<GetNonVoterListResponseDto>> {
-    throw new Error("Method not implemented.");
+    const data = await this.service.getNonVoterList(request);
+
+    return {
+      data,
+      statusCode: 200,
+      statusMsg: "",
+    }
+  }
+
+  @Get(":page")
+  async getCompetitionList(
+    @Param("page") page: string,
+  ): Promise<Res<GetCompetitionListResponseDto>> {
+    if (!page) page = "0";
+    if (isNaN(Number(page)) || Number(page) < 0) {
+      throw new BadRequestException("Parameter have to valid");
+    }
+
+    const data = await this.service.getCompetitionList(page);
+
+    return {
+      data,
+      statusCode: 200,
+      statusMsg: "",
+    };
   }
 
   @Patch(":id")

@@ -8,7 +8,8 @@ import {
   OnModuleInit,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { COMPETITION_STATUS, PrismaClient } from "./client";
+import { COMPETITION_STATUS, PrismaClient, ROLE } from "./client";
+import { List } from "competition/dto/response/getNonVoterList.response.dto";
 
 @Injectable()
 export class PrismaService
@@ -40,8 +41,8 @@ export class PrismaService
     try {
       return await this.club.create({
         data: {
-          club_name: clubName,
-          is_active: isActive,
+          clubName: clubName,
+          isActive: isActive,
         },
       });
     } catch (e) {
@@ -64,8 +65,8 @@ export class PrismaService
       return await this.contests.create({
         data: {
           name,
-          start_date: startDate,
-          end_date: endDate,
+          startDate: startDate,
+          endDate: endDate,
           purpose,
           audience,
           place,
@@ -82,7 +83,7 @@ export class PrismaService
     try {
       return await this.awards.create({
         data: {
-          contest_id: contestId,
+          contestId: contestId,
           count,
           name,
         },
@@ -101,9 +102,9 @@ export class PrismaService
       const { awardId, userId } = winner;
       return await this.winner.create({
         data: {
-          contest_id: contestId,
-          award_id: awardId,
-          user_id: userId,
+          contestId: contestId,
+          awardId: awardId,
+          userId: userId,
         },
       });
     } catch (e) {
@@ -125,7 +126,7 @@ export class PrismaService
     try {
       const thisClub = await this.club.findUnique({
         where: {
-          club_id: clubId,
+          clubId: clubId,
         },
       });
       if (!thisClub) throw new NotFoundException();
@@ -140,7 +141,7 @@ export class PrismaService
     try {
       const result = await this.club.findFirst({
         where: {
-          club_name: clubName,
+          clubName: clubName,
         },
       });
 
@@ -174,11 +175,52 @@ export class PrismaService
           id: true,
           name: true,
           status: true,
-          start_date: true,
-          end_date: true,
+          startDate: true,
+          endDate: true,
         },
       });
       return result;
+    } catch (e) {
+      this.logger.error(e);
+      throw new InternalServerErrorException(e);
+    }
+  }
+
+  async findNonVoterList(id: string, category?: string) {
+    try {
+      const thisCompetition = await this.contests.findUnique({
+        where: { id },
+      });
+
+      if (!thisCompetition)
+        throw new NotFoundException("해당 대회 존재하지 않음");
+
+      const nonVoters = await this.$queryRaw<
+        {
+          userId: string;
+          userName: string;
+          userStudentNumber: number;
+          userRole: ROLE;
+        }[]
+      >`
+        SELECT "u"."user_id" "userId", "u"."user_name" "userName", "u"."user_student_number" "userStudentNumber", "u"."user_role"::TEXT "userRole"
+        FROM (
+          SELECT "v"."userId" "userId"
+          FROM "data"."Vote" "v"
+          WHERE "v"."contestId" = ${id}
+        ) "v"
+        RIGHT JOIN "data"."foreign_user" "u"
+        ON "v"."userId" = "u"."user_id"
+        WHERE "v"."userId" IS NULL AND "u"."user_role"::TEXT IN ('Student', 'Teacher')
+        ORDER BY "userRole", "userStudentNumber", "userId";
+      `;
+
+      return nonVoters.map((e) => ({
+        id: e.userId,
+        name: e.userName,
+        number: e.userStudentNumber,
+        category: e.userRole,
+      }));
     } catch (e) {
       this.logger.error(e);
       throw new InternalServerErrorException(e);
@@ -191,10 +233,10 @@ export class PrismaService
       if (!thisClub) throw new NotFoundException();
       return await this.club.update({
         where: {
-          club_id: clubId,
+          clubId: clubId,
         },
         data: {
-          is_active: !thisClub.is_active,
+          isActive: !thisClub.isActive,
         },
       });
     } catch (e) {
@@ -230,8 +272,8 @@ export class PrismaService
           data: {
             name: obj.name ?? thisComp.name,
             status: obj.status ?? thisComp.status,
-            start_date: new Date(obj.startDate ?? thisComp.start_date),
-            end_date: new Date(obj.endDate ?? thisComp.end_date),
+            startDate: new Date(obj.startDate ?? thisComp.startDate),
+            endDate: new Date(obj.endDate ?? thisComp.endDate),
             purpose: obj.purpose ?? thisComp.purpose,
             audience: obj.audience ?? thisComp.audience,
             place: obj.place ?? thisComp.place,
@@ -250,7 +292,7 @@ export class PrismaService
       if (!thisClub) throw new NotFoundException();
       return await this.club.delete({
         where: {
-          club_id: clubId,
+          clubId: clubId,
         },
       });
     } catch (e) {

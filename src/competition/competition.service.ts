@@ -6,7 +6,10 @@ import { PostAwardsRequestDto } from "./dto/request/postAwards.request.dto";
 import { PostCompetitionRequestDto } from "./dto/request/postCompetition.request.dto";
 import { GetCompetitionResponseDto } from "./dto/response/getCompetition.response.dto";
 import { GetCompetitionListResponseDto } from "./dto/response/getCompetitionList.response.dto";
-import { GetNonVoterListResponseDto } from "./dto/response/getNonVoterList.response.dto";
+import {
+  GetNonVoterListResponseDto,
+  List,
+} from "./dto/response/getNonVoterList.response.dto";
 import { GetRecentCompetitionsResponseDto } from "./dto/response/getRecentCompetitions.response.dto";
 import { GetVotingPrefectureResponseDto } from "./dto/response/getVotingPrefecture.response.dto";
 import { PatchCompetitionResponseDto } from "./dto/response/patchCompetition.response.dto";
@@ -77,8 +80,8 @@ export class CompetitionService implements ICompetitionService {
         id: x.id,
         status: x.status,
         name: x.name,
-        startDate: x.start_date.toISOString(),
-        endDate: x.end_date.toISOString(),
+        startDate: x.startDate.toISOString(),
+        endDate: x.endDate.toISOString(),
       };
     });
 
@@ -98,8 +101,8 @@ export class CompetitionService implements ICompetitionService {
       id,
       name: comp.name,
       status: comp.status,
-      startDate: comp.start_date.toISOString(),
-      endDate: comp.end_date.toISOString(),
+      startDate: comp.startDate.toISOString(),
+      endDate: comp.endDate.toISOString(),
       purpose: comp.purpose,
       audience: comp.audience,
       place: comp.place,
@@ -115,7 +118,11 @@ export class CompetitionService implements ICompetitionService {
   async getNonVoterList(
     request: GetNonVoterListRequestDto,
   ): Promise<GetNonVoterListResponseDto> {
-    throw new Error("Method not implemented.");
+    const { id, category } = request;
+
+    const list: List[] = await this.prisma.findNonVoterList(id, category);
+
+    return { list };
   }
 
   async patchCompetition(

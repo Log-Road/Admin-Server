@@ -19,8 +19,8 @@ describe("CompetitionService", () => {
     [key: string]: {
       id: string;
       name: string;
-      start_date: Date;
-      end_date: Date;
+      startDate: Date;
+      endDate: Date;
       purpose: string;
       audience: string;
       place: string;
@@ -43,13 +43,29 @@ describe("CompetitionService", () => {
       userId: string;
     };
   } = {};
+  let voteDatabase: {
+    [key: string]: {
+      contestId: string;
+      projectId: string;
+      userId: string;
+    };
+  };
+  let foreignUserDatabase: {
+    [key: string]: {
+      userId: string;
+      userStringId: string;
+      userRole: string;
+      userName: string;
+      userStudentNumber: number;
+    };
+  };
 
   const prismaMock = {
     saveCompetition: jest.fn(
       async (competition: {
         name: string;
-        start_date: Date;
-        end_date: Date;
+        startDate: Date;
+        endDate: Date;
         purpose: string;
         audience: string;
         place: string;
@@ -83,6 +99,29 @@ describe("CompetitionService", () => {
     findCompetitionList: jest.fn(async (page: number) => {
       return Object.values(competitionDatabase).slice(page, page + 15);
     }),
+    findNonVoterList: jest.fn(async (id: string, category?: string) => {
+      const voter = Object.values(voteDatabase)
+        .filter((e) => e.contestId == id)
+        .map((e) => e.userId);
+
+      const nonVoter = Object.values(foreignUserDatabase)
+        .filter(
+          (e) =>
+            !voter.includes(e.userId) &&
+            (e.userRole == "Student" || e.userRole == "Teacher"),
+        )
+        .map((e) => ({
+          id: e.userId,
+          name: e.userName,
+          number: e.userStudentNumber,
+          category: e.userRole,
+        }))
+        .sort((a, b) => (a.category < b.category ? -1 : 1))
+        .sort((a, b) => (a.number < b.number ? -1 : 1))
+        .sort((a, b) => (a.id < b.id ? -1 : 1));
+
+      return nonVoter;
+    }),
     patchCompetition: jest.fn(
       async (
         id: string,
@@ -101,8 +140,8 @@ describe("CompetitionService", () => {
           id,
           name: obj.name ?? comp.name,
           status: obj.status ?? comp.status,
-          start_date: new Date(obj.startDate ?? comp.start_date),
-          end_date: new Date(obj.endDate ?? comp.end_date),
+          startDate: new Date(obj.startDate ?? comp.startDate),
+          endDate: new Date(obj.endDate ?? comp.endDate),
           purpose: obj.purpose ?? comp.purpose,
           audience: obj.audience ?? comp.audience,
           place: obj.place ?? comp.place,
@@ -128,8 +167,8 @@ describe("CompetitionService", () => {
         id: "0",
         name: "대덕소프트웨어마이스터고등학교 전국 중학생 알고리즘 대회",
         status: "ONGOING",
-        start_date: new Date("2024-08-27T00:00:00.000Z"),
-        end_date: new Date("2024-08-30T23:59:59.000Z"),
+        startDate: new Date("2024-08-27T00:00:00.000Z"),
+        endDate: new Date("2024-08-30T23:59:59.000Z"),
         purpose:
           "학생들의 알고리즘 풀이 능력 향상 및 중학생 대상으로 본교 홍보",
         audience: "전국 중학생 중 본 대회의 예선 통과자",
@@ -138,6 +177,8 @@ describe("CompetitionService", () => {
     };
     awardDatabase = {};
     winnerDatabase = {};
+    voteDatabase = {};
+    foreignUserDatabase = {};
 
     prismaMock.saveCompetition.mockClear();
     prismaMock.saveAwards.mockClear();
@@ -216,8 +257,8 @@ describe("CompetitionService", () => {
       competitionDatabase["1"] = {
         id: "1",
         name: "test",
-        start_date: new Date("2024-08-19T00:00:00Z"),
-        end_date: new Date("2024-08-21T23:59:59Z"),
+        startDate: new Date("2024-08-19T00:00:00Z"),
+        endDate: new Date("2024-08-21T23:59:59Z"),
         purpose: "학생들의 협업 능력 향상 및 코드 검수 정도 확인",
         audience: "대덕소프트웨어마이스터고등학교 2학년",
         place: "청죽관",
@@ -293,8 +334,8 @@ describe("CompetitionService", () => {
         "0": {
           id: "0",
           name: "test",
-          start_date: new Date("2024-08-19T00:00:00Z"),
-          end_date: new Date("2024-08-21T23:59:59Z"),
+          startDate: new Date("2024-08-19T00:00:00Z"),
+          endDate: new Date("2024-08-21T23:59:59Z"),
           purpose: "학생들의 협업 능력 향상 및 코드 검수 정도 확인",
           audience: "대덕소프트웨어마이스터고등학교 2학년",
           place: "청죽관",
@@ -303,8 +344,8 @@ describe("CompetitionService", () => {
         "1": {
           id: "1",
           name: "test",
-          start_date: new Date("2024-08-19T00:00:00Z"),
-          end_date: new Date("2024-08-21T23:59:59Z"),
+          startDate: new Date("2024-08-19T00:00:00Z"),
+          endDate: new Date("2024-08-21T23:59:59Z"),
           purpose: "학생들의 협업 능력 향상 및 코드 검수 정도 확인",
           audience: "대덕소프트웨어마이스터고등학교 2학년",
           place: "청죽관",
@@ -403,6 +444,90 @@ describe("CompetitionService", () => {
     });
   });
 
+  describe("GetNonVoterList", () => {
+    const request = {
+      id: "1",
+      category: "Student",
+    };
+
+    it("[200]", async () => {
+      foreignUserDatabase = {
+        "afd29e54-9207-47a6-8816-9e6e971feb97": {
+          userId: "afd29e54-9207-47a6-8816-9e6e971feb97",
+          userName: "Admin",
+          userRole: "Admin",
+          userStringId: "admin1234",
+          userStudentNumber: null,
+        },
+        "95d1e209-0337-40f4-a852-3c16f3a9a2df": {
+          userId: "95d1e209-0337-40f4-a852-3c16f3a9a2df",
+          userName: "청도서",
+          userRole: "Teacher",
+          userStringId: "r0adwest",
+          userStudentNumber: null,
+        },
+        "95d1e209-0337-40f4-a842-3c16f3a9a2df": {
+          userId: "95d1e209-0337-40f4-a842-3c16f3a9a2df",
+          userName: "청희도",
+          userRole: "Teacher",
+          userStringId: "ziio",
+          userStudentNumber: null,
+        },
+        "5fe187b2-cf86-4bda-b1f8-d638f2c53324": {
+          userId: "5fe187b2-cf86-4bda-b1f8-d638f2c53324",
+          userName: "홍길동",
+          userRole: "Student",
+          userStringId: "hongi1d0ng",
+          userStudentNumber: 2345,
+        },
+        "5fe187b2-ctfx-4bda-b1f8-d638f2c53324": {
+          userId: "5fe187b2-ctfx-4bda-b1f8-d638f2c53324",
+          userName: "홍이삭",
+          userRole: "Student",
+          userStringId: "binding0f1ssac",
+          userStudentNumber: 2468,
+        },
+      };
+
+      voteDatabase = {
+        "1": {
+          userId: "95d1e209-0337-40f4-a842-3c16f3a9a2df",
+          contestId: "1",
+          projectId: "1",
+        },
+        "2": {
+          userId: "5fe187b2-ctfx-4bda-b1f8-d638f2c53324",
+          contestId: "1",
+          projectId: "4",
+        },
+      };
+
+      const res = await service.getNonVoterList(request);
+
+      expect(prismaMock.findNonVoterList).toHaveBeenCalledTimes(1);
+      expect(prismaMock.findNonVoterList).toHaveBeenCalledWith(
+        request.id,
+        request.category,
+      );
+      expect(res).toEqual({
+        list: [
+          {
+            id: "5fe187b2-cf86-4bda-b1f8-d638f2c53324",
+            name: "홍길동",
+            number: 2345,
+            category: "Student",
+          },
+          {
+            id: "95d1e209-0337-40f4-a852-3c16f3a9a2df",
+            name: "청도서",
+            number: null,
+            category: "Teacher",
+          },
+        ],
+      });
+    });
+  });
+
   describe("PatchCompetition", () => {
     const id = "0";
     const request: PatchCompetitionRequestDto = {};
@@ -426,8 +551,8 @@ describe("CompetitionService", () => {
           id: "0",
           name: "전국 중학생 알고리즘 대회",
           status: "IN_PROGRESS",
-          start_date: new Date("2024-08-27T10:00:00Z"),
-          end_date: new Date("2024-08-29T23:59:59Z"),
+          startDate: new Date("2024-08-27T10:00:00Z"),
+          endDate: new Date("2024-08-29T23:59:59Z"),
           purpose: "본교 홍보 및 중학생의 알고리즘 풀이 능력 향상 등",
           audience: "대전 관내 중학생",
           place:
@@ -454,8 +579,8 @@ describe("CompetitionService", () => {
           id: "0",
           name: "대덕소프트웨어마이스터고등학교 전국 중학생 알고리즘 대회",
           status: "CLOSED",
-          start_date: new Date("2024-08-27T10:00:00.000Z"),
-          end_date: new Date("2024-08-30T23:59:59.000Z"),
+          startDate: new Date("2024-08-27T10:00:00.000Z"),
+          endDate: new Date("2024-08-30T23:59:59.000Z"),
           purpose: "본교 홍보 및 중학생의 알고리즘 풀이 능력 향상 등",
           audience: "전국 중학생 중 본 대회의 예선 통과자",
           place: "대덕소프트웨어마이스터고등학교 소프트웨어개발 1 ~ 3실",

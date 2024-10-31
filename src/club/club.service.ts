@@ -41,7 +41,7 @@ export class ClubService implements IClubService {
     const club = await this.prisma.saveClub(clubName, isActive);
 
     return {
-      club_id: club.club_id,
+      club_id: club.clubId,
     };
   }
 

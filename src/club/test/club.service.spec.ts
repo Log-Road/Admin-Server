@@ -21,16 +21,18 @@ describe("ClubService", () => {
   let clubDatabase = {};
   let userDatabase = {};
 
+  const club_id = "a0a66122-d17c-4768-aaef-5e566e93606a"
+
   const prismaMock = {
     saveClub: jest.fn(async (clubName: string, isActive?: boolean) => {
       clubDatabase[clubName] = isActive ?? true;
       return {
-        club_id: "a0a66122-d17c-4768-aaef-5e566e93606a",
+        clubId: club_id,
       };
     }),
     findClub: jest.fn(async (clubId: string) => {
       return {
-        club_id: "a0a66122-d17c-4768-aaef-5e566e93606a",
+        club_id,
         club_name: "Log",
         is_active: true,
       };
@@ -55,7 +57,7 @@ describe("ClubService", () => {
     }),
     patchClubStatus: jest.fn(async (clubId: string) => {
       return {
-        club_id: "a0a66122-d17c-4768-aaef-5e566e93606a",
+        club_id,
         club_name: "Log",
         is_active: false,
       };
@@ -81,12 +83,7 @@ describe("ClubService", () => {
 
     service = module.get<ClubService>(ClubService);
 
-    prismaMock.saveClub.mockClear();
-    prismaMock.findClub.mockClear();
-    prismaMock.findClubByName.mockClear();
-    prismaMock.findClubs.mockClear();
-    prismaMock.patchClubStatus.mockClear();
-    prismaMock.deleteClub.mockClear();
+    jest.clearAllMocks();
 
     clubDatabase = {};
     userDatabase = {};
@@ -106,7 +103,7 @@ describe("ClubService", () => {
         request.is_active,
       );
       expect(res).toEqual({
-        club_id: "a0a66122-d17c-4768-aaef-5e566e93606a",
+        club_id,
       });
     });
 
