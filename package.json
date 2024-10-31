@@ -3,7 +3,7 @@
 		"generate": "prisma generate --schema=src/prisma/schema.prisma",
 		"generate:proto": "protoc --plugin=./node_modules/.bin/protoc-gen-ts_proto --ts_proto_out=./ --ts_proto_opt=nestJs=true ./src/proto/dias.proto",
 		"build": "nest build",
-		"start": "dotenv -f .env run nest start",
+		"start": "nest start",
 		"start:local": "dotenv -f ./.env.dev run nest start",
 		"test:unit": "jest --config jest.config.js",
 		"test:e2e": ""
