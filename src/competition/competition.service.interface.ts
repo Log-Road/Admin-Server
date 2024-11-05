@@ -7,7 +7,7 @@ import { GetCompetitionResponseDto } from "./dto/response/getCompetition.respons
 import { GetCompetitionListResponseDto } from "./dto/response/getCompetitionList.response.dto";
 import { GetNonVoterListResponseDto } from "./dto/response/getNonVoterList.response.dto";
 import { GetRecentCompetitionsResponseDto } from "./dto/response/getRecentCompetitions.response.dto";
-import { GetVotingPrefectureResponseDto } from "./dto/response/getVotingPrefecture.response.dto";
+import { GetVotePerResponseDto } from "./dto/response/getVotePer.response.dto";
 import { PatchCompetitionResponseDto } from "./dto/response/patchCompetition.response.dto";
 import { PostAwardsResponseDto } from "./dto/response/postAwards.response.dto";
 import { PostCompetitionResponseDto } from "./dto/response/postCompetition.response.dto";
@@ -23,15 +23,13 @@ export interface ICompetitionService {
   getCompetitionList(page: string): Promise<GetCompetitionListResponseDto>;
   getRecentCompetitions(): Promise<GetRecentCompetitionsResponseDto>;
   getCompetition(id: string): Promise<GetCompetitionResponseDto>;
-  getVotingPrefecture(id: string): Promise<GetVotingPrefectureResponseDto>;
   getNonVoterList(
     request: GetNonVoterListRequestDto,
   ): Promise<GetNonVoterListResponseDto>;
+  getVotePer(id: string): Promise<GetVotePerResponseDto>;
   patchCompetition(
     id: string,
     request: PatchCompetitionRequestDto,
   ): Promise<PatchCompetitionResponseDto>;
-  deleteCompetition(
-    id: string,
-  ): Promise<DeleteCompetitionResponseDto>;
+  deleteCompetition(id: string): Promise<DeleteCompetitionResponseDto>;
 }

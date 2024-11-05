@@ -87,6 +87,12 @@ describe("CompetitionController", () => {
         ],
       };
     }),
+    getVotePer: jest.fn(() => {
+      return {
+        student: 26,
+        teacher: 3,
+      };
+    }),
     patchCompetition: jest.fn(() => {
       return {
         id: "1",
@@ -310,6 +316,25 @@ describe("CompetitionController", () => {
               category: "Teacher",
             },
           ],
+        },
+        statusCode: 200,
+        statusMsg: "",
+      });
+    });
+  });
+
+  describe("GetVotePer", () => {
+    const id = "b6ee2cd2-4596-47ee-b332-de87e1p39e80";
+
+    it("[200]", async () => {
+      const res = await controller.getVotePer(id);
+
+      expect(serviceMock.getVotePer).toHaveBeenCalledTimes(1);
+      expect(serviceMock.getVotePer).toHaveBeenCalledWith(id);
+      expect(res).toEqual({
+        data: {
+          student: 26,
+          teacher: 3,
         },
         statusCode: 200,
         statusMsg: "",

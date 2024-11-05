@@ -242,6 +242,31 @@ export class PrismaService
     }
   }
 
+  async findCountVoterPer(
+    id: string,
+    role: "Student" | "Teacher",
+    all: boolean,
+  ) {
+    try {
+      const cnt = await this.$queryRaw`
+        SELECT COUNT("u"."user_id") "count"
+        FROM (
+          SELECT "v"."user_id" "userId"
+          FROM "Vote" "v"
+          WHERE "v"."contest_id" = ${id}
+        ) "v"
+        RIGHT JOIN "foreign_user" "u"
+        ON "v"."userId" = "u"."user_id"
+        WHERE (${all}='false' AND "user_role" = ${role})
+      `;
+
+      return cnt;
+    } catch (e) {
+      this.logger.error(e);
+      throw new InternalServerErrorException(e);
+    }
+  }
+
   async patchClubStatus(clubId: string) {
     try {
       const thisClub = await this.findClub(clubId);

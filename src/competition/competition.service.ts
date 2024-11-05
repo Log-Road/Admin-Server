@@ -17,12 +17,12 @@ import {
   List,
 } from "./dto/response/getNonVoterList.response.dto";
 import { GetRecentCompetitionsResponseDto } from "./dto/response/getRecentCompetitions.response.dto";
-import { GetVotingPrefectureResponseDto } from "./dto/response/getVotingPrefecture.response.dto";
 import { PatchCompetitionResponseDto } from "./dto/response/patchCompetition.response.dto";
 import { PostAwardsResponseDto } from "./dto/response/postAwards.response.dto";
 import { PostCompetitionResponseDto } from "./dto/response/postCompetition.response.dto";
 import { PrismaService } from "../prisma/prisma.service";
 import { DeleteCompetitionResponseDto } from "./dto/response/deleteCompetition.response.dto";
+import { GetVotePerResponseDto } from "./dto/response/getVotePer.response.dto";
 
 @Injectable()
 export class CompetitionService implements ICompetitionService {
@@ -128,10 +128,18 @@ export class CompetitionService implements ICompetitionService {
     };
   }
 
-  async getVotingPrefecture(
-    id: string,
-  ): Promise<GetVotingPrefectureResponseDto> {
-    throw new Error("Method not implemented.");
+  async getVotePer(id: string): Promise<GetVotePerResponseDto> {
+    const student =
+      Number((await this.prisma.findCountVoterPer(id, "Student", true))[0].count) /
+      Number((await this.prisma.findCountVoterPer(id, "Student", false))[0].count);
+    const teacher =
+      Number((await this.prisma.findCountVoterPer(id, "Teacher", true))[0].count) /
+      Number((await this.prisma.findCountVoterPer(id, "Teacher", false))[0].count);
+
+    return {
+      student,
+      teacher,
+    };
   }
 
   async getNonVoterList(
