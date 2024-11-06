@@ -110,7 +110,6 @@ export class CompetitionController implements ICompetitionController {
     @Param("id") id: string,
   ): Promise<Res<GetVotePerResponseDto>> {
     if (!id) throw new BadRequestException();
-    if (!(await this.service.getCompetition(id))) throw new NotFoundException();
 
     const data = await this.service.getVotePer(id);
 

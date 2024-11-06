@@ -129,6 +129,8 @@ export class CompetitionService implements ICompetitionService {
   }
 
   async getVotePer(id: string): Promise<GetVotePerResponseDto> {
+    if (!(await this.prisma.findCompetitionById(id)))
+      throw new NotFoundException();
     const allStudent =
       Number(
         (await this.prisma.findCountVoterPer(id, "Student", true))[0].count,

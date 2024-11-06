@@ -681,8 +681,23 @@ describe("CompetitionService", () => {
         },
       };
 
+      competitionDatabase = {
+        "1" : {
+          id: "1",
+          name: "competition-test",
+          startDate: new Date("2024-10-10"),
+          endDate: new Date("2024-10-20"),
+          purpose: "TESTING",
+          audience: "members",
+          place: "Github",
+          status: COMPETITION_STATUS.IN_PROGRESS,
+        }
+      }
+
       const res = await service.getVotePer(id);
 
+      expect(prismaMock.findCompetitionById).toHaveBeenCalledTimes(1);
+      expect(prismaMock.findCompetitionById).toHaveBeenCalledWith(id);
       expect(prismaMock.findCountVoterPer).toHaveBeenCalledTimes(4);
       expect(prismaMock.findCountVoterPer).toHaveBeenNthCalledWith(
         1,

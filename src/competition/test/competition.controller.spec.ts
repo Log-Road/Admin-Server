@@ -327,7 +327,6 @@ describe("CompetitionController", () => {
 
       expect(serviceMock.getVotePer).toHaveBeenCalledTimes(1);
       expect(serviceMock.getVotePer).toHaveBeenCalledWith(id);
-      expect(serviceMock.getCompetition).toHaveBeenCalledTimes(1);
       expect(res).toEqual({
         data: {
           student: 26,
@@ -346,18 +345,6 @@ describe("CompetitionController", () => {
       );
       expect(serviceMock.getVotePer).toHaveBeenCalledTimes(0);
       expect(serviceMock.getCompetition).toHaveBeenCalledTimes(0);
-    });
-
-    it("[404] competition not found", async () => {
-      const id = "non-existent-id";
-
-      serviceMock.getCompetition = jest.fn().mockReturnValueOnce(undefined);
-
-      await expect(async () => await controller.getVotePer(id)).rejects.toThrow(
-        new NotFoundException(),
-      );
-      expect(serviceMock.getVotePer).toHaveBeenCalledTimes(0);
-      expect(serviceMock.getCompetition).toHaveBeenCalledTimes(1);
     });
   });
 
