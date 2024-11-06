@@ -130,49 +130,25 @@ describe("CompetitionService", () => {
     }),
     findCountVoterPer: jest.fn(
       async (id: string, role: string, all: boolean) => {
-        let count = 0;
-        const voter = Object.values(voteDatabase)
-          .filter((e) => e.contestId == id)
-          .map((e) => e.userId);
-
-        console.log(voter);
-
-        const users = Object.values(foreignUserDatabase).filter((e) =>
-          ["Student", "Teacher"].includes(e.userRole),
+        const users = Object.values(foreignUserDatabase).filter(
+          (e) => e.userRole === role,
         );
 
-        console.log(users, all, role);
+        const voters = Object.values(voteDatabase)
+          .filter((e) => e.contestId === id)
+          .map((e) => e.userId);
 
-        if (all) count = users.length;
-        else {
-          count = users.filter((e) => voter.includes(e.userId)).length;
+        let count = 0;
+
+        if (all) {
+          count = users.length;
+        } else {
+          count = users.filter((e) => voters.includes(e.userId)).length;
         }
 
         return [{ count }];
       },
     ),
-    /**
-     * findCountVoterPer = jest.fn(
-  async (id, role, all) => {
-    let count = 0;
-
-    const voter = Object.values(voteDatabase)
-      .filter((e) => e.contestId === id)
-      .map((e) => e.userId);
-
-    const users = Object.values(foreignUserDatabase).filter(
-      (e) =>
-        (!voter.includes(e.userId) || all) &&  
-        ["Student", "Teacher"].includes(e.userRole)
-    );
-
-    if (all) count = users.length;
-    else {
-      count = users.filter((e) => e.userRole === role).length;
-    }
-
-    return [{ count }];
-     */
     patchCompetition: jest.fn(
       async (
         id: string,
@@ -657,94 +633,87 @@ describe("CompetitionService", () => {
     });
   });
 
-  // describe("GetVotePer", () => {
-  //   const id = "1";
+  describe("GetVotePer", () => {
+    const id = "1";
 
-  //   it("[200]", async () => {
-  //     foreignUserDatabase = {
-  //       "afd29e54-9207-47a6-8816-9e6e971feb97": {
-  //         userId: "afd29e54-9207-47a6-8816-9e6e971feb97",
-  //         userName: "Admin",
-  //         userRole: "Admin",
-  //         userStringId: "admin1234",
-  //         userStudentNumber: null,
-  //       },
-  //       "95d1e209-0337-40f4-a852-3c16f3a9a2df": {
-  //         userId: "95d1e209-0337-40f4-a852-3c16f3a9a2df",
-  //         userName: "청도서",
-  //         userRole: "Teacher",
-  //         userStringId: "r0adwest",
-  //         userStudentNumber: null,
-  //       },
-  //       "95d1e209-0337-40f4-a842-3c16f3a9a2df": {
-  //         userId: "95d1e209-0337-40f4-a842-3c16f3a9a2df",
-  //         userName: "청희도",
-  //         userRole: "Teacher",
-  //         userStringId: "ziio",
-  //         userStudentNumber: null,
-  //       },
-  //       "5fe187b2-cf86-4bda-b1f8-d638f2c53324": {
-  //         userId: "5fe187b2-cf86-4bda-b1f8-d638f2c53324",
-  //         userName: "홍길동",
-  //         userRole: "Student",
-  //         userStringId: "hongi1d0ng",
-  //         userStudentNumber: 2345,
-  //       },
-  //       "5fe187b2-ctfx-4bda-b1f8-d638f2c53324": {
-  //         userId: "5fe187b2-ctfx-4bda-b1f8-d638f2c53324",
-  //         userName: "홍이삭",
-  //         userRole: "Student",
-  //         userStringId: "binding0f1ssac",
-  //         userStudentNumber: 2468,
-  //       },
-  //     };
+    it("[200]", async () => {
+      foreignUserDatabase = {
+        "95d1e209-0337-40f4-a852-3c16f3a9a2df": {
+          userId: "95d1e209-0337-40f4-a852-3c16f3a9a2df",
+          userName: "청도서",
+          userRole: "Teacher",
+          userStringId: "r0adwest",
+          userStudentNumber: null,
+        },
+        "95d1e209-0337-40f4-a842-3c16f3a9a2df": {
+          userId: "95d1e209-0337-40f4-a842-3c16f3a9a2df",
+          userName: "청희도",
+          userRole: "Teacher",
+          userStringId: "ziio",
+          userStudentNumber: null,
+        },
+        "5fe187b2-cf86-4bda-b1f8-d638f2c53324": {
+          userId: "5fe187b2-cf86-4bda-b1f8-d638f2c53324",
+          userName: "홍길동",
+          userRole: "Student",
+          userStringId: "hongi1d0ng",
+          userStudentNumber: 2345,
+        },
+        "5fe187b2-ctfx-4bda-b1f8-d638f2c53324": {
+          userId: "5fe187b2-ctfx-4bda-b1f8-d638f2c53324",
+          userName: "홍이삭",
+          userRole: "Student",
+          userStringId: "binding0f1ssac",
+          userStudentNumber: 2468,
+        },
+      };
 
-  //     voteDatabase = {
-  //       "1": {
-  //         userId: "95d1e209-0337-40f4-a852-3c16f3a9a2df",
-  //         contestId: "1",
-  //         projectId: "1",
-  //       },
-  //       "2": {
-  //         userId: "5fe187b2-cf86-4bda-b1f8-d638f2c53324",
-  //         contestId: "1",
-  //         projectId: "4",
-  //       },
-  //     };
+      voteDatabase = {
+        "1": {
+          userId: "95d1e209-0337-40f4-a852-3c16f3a9a2df",
+          contestId: "1",
+          projectId: "1",
+        },
+        "2": {
+          userId: "5fe187b2-cf86-4bda-b1f8-d638f2c53324",
+          contestId: "1",
+          projectId: "4",
+        },
+      };
 
-  //     const res = await service.getVotePer(id);
+      const res = await service.getVotePer(id);
 
-  //     expect(prismaMock.findCountVoterPer).toHaveBeenCalledTimes(4);
-  //     expect(prismaMock.findCountVoterPer).toHaveBeenNthCalledWith(
-  //       1,
-  //       id,
-  //       "Student",
-  //       true,
-  //     );
-  //     expect(prismaMock.findCountVoterPer).toHaveBeenNthCalledWith(
-  //       2,
-  //       id,
-  //       "Student",
-  //       false,
-  //     );
-  //     expect(prismaMock.findCountVoterPer).toHaveBeenNthCalledWith(
-  //       3,
-  //       id,
-  //       "Teacher",
-  //       true,
-  //     );
-  //     expect(prismaMock.findCountVoterPer).toHaveBeenNthCalledWith(
-  //       4,
-  //       id,
-  //       "Teacher",
-  //       false,
-  //     );
-  //     expect(res).toEqual({
-  //       student: 0.5,
-  //       teacher: 0.5,
-  //     });
-  //   });
-  // });
+      expect(prismaMock.findCountVoterPer).toHaveBeenCalledTimes(4);
+      expect(prismaMock.findCountVoterPer).toHaveBeenNthCalledWith(
+        1,
+        id,
+        "Student",
+        true,
+      );
+      expect(prismaMock.findCountVoterPer).toHaveBeenNthCalledWith(
+        2,
+        id,
+        "Student",
+        false,
+      );
+      expect(prismaMock.findCountVoterPer).toHaveBeenNthCalledWith(
+        3,
+        id,
+        "Teacher",
+        true,
+      );
+      expect(prismaMock.findCountVoterPer).toHaveBeenNthCalledWith(
+        4,
+        id,
+        "Teacher",
+        false,
+      );
+      expect(res).toEqual({
+        student: 0.5,
+        teacher: 0.5,
+      });
+    });
+  });
 
   describe("PatchCompetition", () => {
     const id = "0";

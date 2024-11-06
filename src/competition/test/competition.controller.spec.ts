@@ -3,7 +3,7 @@ import { CompetitionController } from "../competition.controller";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CompetitionService } from "../competition.service";
-import { BadRequestException, Logger } from "@nestjs/common";
+import { BadRequestException, Logger, NotFoundException } from "@nestjs/common";
 import { PostCompetitionRequestDto } from "../dto/request/postCompetition.request.dto";
 import { PostAwardsRequestDto } from "../dto/request/postAwards.request.dto";
 import { COMPETITION_STATUS } from "../../prisma/client";
@@ -116,11 +116,7 @@ describe("CompetitionController", () => {
 
     controller = module.get<CompetitionController>(CompetitionController);
 
-    serviceMock.postCompetition.mockClear();
-    serviceMock.postAwards.mockClear();
-    serviceMock.getCompetitionList.mockClear();
-    serviceMock.getCompetition.mockClear();
-    serviceMock.getNonVoterList.mockClear();
+    jest.clearAllMocks();
   });
 
   describe("PostCompetition", () => {
@@ -331,6 +327,7 @@ describe("CompetitionController", () => {
 
       expect(serviceMock.getVotePer).toHaveBeenCalledTimes(1);
       expect(serviceMock.getVotePer).toHaveBeenCalledWith(id);
+      expect(serviceMock.getCompetition).toHaveBeenCalledTimes(1);
       expect(res).toEqual({
         data: {
           student: 26,
@@ -339,6 +336,28 @@ describe("CompetitionController", () => {
         statusCode: 200,
         statusMsg: "",
       });
+    });
+
+    it("[400] empty id", async () => {
+      const id = undefined;
+
+      await expect(async () => await controller.getVotePer(id)).rejects.toThrow(
+        new BadRequestException(),
+      );
+      expect(serviceMock.getVotePer).toHaveBeenCalledTimes(0);
+      expect(serviceMock.getCompetition).toHaveBeenCalledTimes(0);
+    });
+
+    it("[404] competition not found", async () => {
+      const id = "non-existent-id";
+
+      serviceMock.getCompetition = jest.fn().mockReturnValueOnce(undefined);
+
+      await expect(async () => await controller.getVotePer(id)).rejects.toThrow(
+        new NotFoundException(),
+      );
+      expect(serviceMock.getVotePer).toHaveBeenCalledTimes(0);
+      expect(serviceMock.getCompetition).toHaveBeenCalledTimes(1);
     });
   });
 

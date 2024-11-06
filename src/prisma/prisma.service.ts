@@ -250,15 +250,17 @@ export class PrismaService
     try {
       const cnt = await this.$queryRaw`
         SELECT COUNT("u"."user_id") "count"
-        FROM (
-          SELECT "v"."user_id" "userId"
-          FROM "Vote" "v"
-          WHERE "v"."contest_id" = ${id}
-        ) "v"
-        RIGHT JOIN "foreign_user" "u"
-        ON "v"."userId" = "u"."user_id"
-        WHERE (${all}='false' AND "user_role" = ${role})
-      `;
+        FROM "foreign_user" "u"
+        LEFT JOIN (
+          SELECT "user_id"
+          FROM "Vote"
+          WHERE "contest_id" = ${id}
+        ) "v" ON "u"."user_id" = "v"."user_id"
+        WHERE CASE 
+          WHEN ${all}::boolean THEN TRUE 
+          ELSE "u"."user_role"::text = ${role}::text 
+        END;
+      `
 
       return cnt;
     } catch (e) {

@@ -129,16 +129,24 @@ export class CompetitionService implements ICompetitionService {
   }
 
   async getVotePer(id: string): Promise<GetVotePerResponseDto> {
-    const student =
-      Number((await this.prisma.findCountVoterPer(id, "Student", true))[0].count) /
-      Number((await this.prisma.findCountVoterPer(id, "Student", false))[0].count);
-    const teacher =
-      Number((await this.prisma.findCountVoterPer(id, "Teacher", true))[0].count) /
-      Number((await this.prisma.findCountVoterPer(id, "Teacher", false))[0].count);
+    const allStudent =
+      Number(
+        (await this.prisma.findCountVoterPer(id, "Student", true))[0].count,
+      ) ?? 1;
+    const votedStudent = Number(
+      (await this.prisma.findCountVoterPer(id, "Student", false))[0].count,
+    );
+    const allTeacher =
+      Number(
+        (await this.prisma.findCountVoterPer(id, "Teacher", true))[0].count,
+      ) ?? 1;
+    const votedTeacher = Number(
+      (await this.prisma.findCountVoterPer(id, "Teacher", false))[0].count,
+    );
 
     return {
-      student,
-      teacher,
+      student: votedStudent / allStudent,
+      teacher: votedTeacher / allTeacher,
     };
   }
 

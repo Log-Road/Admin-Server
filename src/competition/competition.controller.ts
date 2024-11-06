@@ -6,6 +6,7 @@ import {
   Get,
   Inject,
   Logger,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -105,7 +106,12 @@ export class CompetitionController implements ICompetitionController {
   }
 
   @Get("per/:id")
-  async getVotePer(id: string): Promise<Res<GetVotePerResponseDto>> {
+  async getVotePer(
+    @Param("id") id: string,
+  ): Promise<Res<GetVotePerResponseDto>> {
+    if (!id) throw new BadRequestException();
+    if (!(await this.service.getCompetition(id))) throw new NotFoundException();
+
     const data = await this.service.getVotePer(id);
 
     return {
