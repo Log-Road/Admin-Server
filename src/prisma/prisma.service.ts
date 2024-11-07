@@ -244,23 +244,23 @@ export class PrismaService
 
   async findCountVoterPer(
     id: string,
-    role: "Student" | "Teacher",
-    all: boolean,
-  ) {
+  ): Promise<
+    { user_role: string; voted_count: number; total_count: number }[]
+  > {
     try {
-      const cnt = await this.$queryRaw`
-        SELECT COUNT("u"."user_id") "count"
-        FROM "foreign_user" "u"
-        LEFT JOIN (
-          SELECT "user_id"
-          FROM "Vote"
-          WHERE "contest_id" = ${id}
-        ) "v" ON "u"."user_id" = "v"."user_id"
-        WHERE CASE 
-          WHEN ${all}::boolean THEN TRUE 
-          ELSE "u"."user_role"::text = ${role}::text 
-        END;
-      `
+      const cnt = await this.$queryRaw<
+        { user_role: string; voted_count: number; total_count: number }[]
+      >`
+        SELECT
+          user_role::TEXT,
+          COUNT(CASE WHEN v.user_id IS NOT NULL THEN 1 END)::INTEGER as voted_count,
+          COUNT(*)::INTEGER as total_count
+        FROM foreign_user fu
+        LEFT JOIN "Vote" v
+        ON fu.user_id = v.user_id AND v.contest_id = ${id}
+        WHERE user_role::TEXT IN ('Student', 'Teacher')
+        GROUP BY user_role
+      `;
 
       return cnt;
     } catch (e) {

@@ -129,26 +129,31 @@ export class CompetitionService implements ICompetitionService {
   }
 
   async getVotePer(id: string): Promise<GetVotePerResponseDto> {
-    if (!(await this.prisma.findCompetitionById(id)))
+    const competition = await this.prisma.findCompetitionById(id);
+    if (!competition) {
       throw new NotFoundException();
-    const allStudent =
-      Number(
-        (await this.prisma.findCountVoterPer(id, "Student", true))[0].count,
-      ) ?? 1;
-    const votedStudent = Number(
-      (await this.prisma.findCountVoterPer(id, "Student", false))[0].count,
-    );
-    const allTeacher =
-      Number(
-        (await this.prisma.findCountVoterPer(id, "Teacher", true))[0].count,
-      ) ?? 1;
-    const votedTeacher = Number(
-      (await this.prisma.findCountVoterPer(id, "Teacher", false))[0].count,
-    );
+    }
+
+    const voteStats = await this.prisma.findCountVoterPer(id);
+    const studentStats = voteStats?.filter(
+      (stat) => stat.user_role === "Student",
+    )[0] ?? { user_role: "Student", total_count: 1, voted_count: 0 };
+    const teacherStats = voteStats?.filter(
+      (stat) => stat.user_role === "Teacher",
+    )[0] ?? { user_role: "Teacher", total_count: 1, voted_count: 0 };
+
+    const student =
+      studentStats.total_count === 0
+        ? 0
+        : studentStats.voted_count / studentStats.total_count;
+    const teacher =
+      teacherStats.total_count === 0
+        ? 0
+        : teacherStats.voted_count / teacherStats.total_count;
 
     return {
-      student: votedStudent / allStudent,
-      teacher: votedTeacher / allTeacher,
+      student,
+      teacher,
     };
   }
 
