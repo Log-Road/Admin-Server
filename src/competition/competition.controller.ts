@@ -154,7 +154,7 @@ export class CompetitionController implements ICompetitionController {
 
   @Delete(":id")
   async deleteCompetition(
-    @Param() id: string,
+    @Param("id") id: string,
   ): Promise<Res<DeleteCompetitionResponseDto>> {
     const data = await this.service.deleteCompetition(id);
 
