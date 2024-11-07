@@ -1,6 +1,6 @@
 import { IsNumber } from "class-validator";
 
-export class GetVotingPrefectureResponseDto {
+export class GetVotePerResponseDto {
   @IsNumber()
   student: number;
 

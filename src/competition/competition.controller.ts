@@ -6,6 +6,7 @@ import {
   Get,
   Inject,
   Logger,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -22,12 +23,12 @@ import { GetCompetitionResponseDto } from "./dto/response/getCompetition.respons
 import { GetCompetitionListResponseDto } from "./dto/response/getCompetitionList.response.dto";
 import { GetNonVoterListResponseDto } from "./dto/response/getNonVoterList.response.dto";
 import { GetRecentCompetitionsResponseDto } from "./dto/response/getRecentCompetitions.response.dto";
-import { GetVotingPrefectureResponseDto } from "./dto/response/getVotingPrefecture.response.dto";
 import { PatchCompetitionResponseDto } from "./dto/response/patchCompetition.response.dto";
 import { PostAwardsResponseDto } from "./dto/response/postAwards.response.dto";
 import { PostCompetitionResponseDto } from "./dto/response/postCompetition.response.dto";
 import { CompetitionService } from "./competition.service";
 import { DeleteCompetitionResponseDto } from "./dto/response/deleteCompetition.response.dto";
+import { GetVotePerResponseDto } from "./dto/response/getVotePer.response.dto";
 
 @Controller("competition")
 export class CompetitionController implements ICompetitionController {
@@ -91,18 +92,26 @@ export class CompetitionController implements ICompetitionController {
     };
   }
 
-  @Get("per/:id")
-  async getVotingPrefecture(
-    @Param("id") id: string,
-  ): Promise<Res<GetVotingPrefectureResponseDto>> {
-    throw new Error("Method not implemented.");
-  }
-
   @Get("list")
   async getNonVoterList(
     @Query() request: GetNonVoterListRequestDto,
   ): Promise<Res<GetNonVoterListResponseDto>> {
     const data = await this.service.getNonVoterList(request);
+
+    return {
+      data,
+      statusCode: 200,
+      statusMsg: "",
+    };
+  }
+
+  @Get("per/:id")
+  async getVotePer(
+    @Param("id") id: string,
+  ): Promise<Res<GetVotePerResponseDto>> {
+    if (!id) throw new BadRequestException();
+
+    const data = await this.service.getVotePer(id);
 
     return {
       data,

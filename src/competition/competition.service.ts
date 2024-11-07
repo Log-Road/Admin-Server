@@ -17,12 +17,12 @@ import {
   List,
 } from "./dto/response/getNonVoterList.response.dto";
 import { GetRecentCompetitionsResponseDto } from "./dto/response/getRecentCompetitions.response.dto";
-import { GetVotingPrefectureResponseDto } from "./dto/response/getVotingPrefecture.response.dto";
 import { PatchCompetitionResponseDto } from "./dto/response/patchCompetition.response.dto";
 import { PostAwardsResponseDto } from "./dto/response/postAwards.response.dto";
 import { PostCompetitionResponseDto } from "./dto/response/postCompetition.response.dto";
 import { PrismaService } from "../prisma/prisma.service";
 import { DeleteCompetitionResponseDto } from "./dto/response/deleteCompetition.response.dto";
+import { GetVotePerResponseDto } from "./dto/response/getVotePer.response.dto";
 
 @Injectable()
 export class CompetitionService implements ICompetitionService {
@@ -128,10 +128,33 @@ export class CompetitionService implements ICompetitionService {
     };
   }
 
-  async getVotingPrefecture(
-    id: string,
-  ): Promise<GetVotingPrefectureResponseDto> {
-    throw new Error("Method not implemented.");
+  async getVotePer(id: string): Promise<GetVotePerResponseDto> {
+    const competition = await this.prisma.findCompetitionById(id);
+    if (!competition) {
+      throw new NotFoundException();
+    }
+
+    const voteStats = await this.prisma.findCountVoterPer(id);
+    const studentStats = voteStats?.filter(
+      (stat) => stat.user_role === "Student",
+    )[0] ?? { user_role: "Student", total_count: 1, voted_count: 0 };
+    const teacherStats = voteStats?.filter(
+      (stat) => stat.user_role === "Teacher",
+    )[0] ?? { user_role: "Teacher", total_count: 1, voted_count: 0 };
+
+    const student =
+      studentStats.total_count === 0
+        ? 0
+        : studentStats.voted_count / studentStats.total_count;
+    const teacher =
+      teacherStats.total_count === 0
+        ? 0
+        : teacherStats.voted_count / teacherStats.total_count;
+
+    return {
+      student,
+      teacher,
+    };
   }
 
   async getNonVoterList(

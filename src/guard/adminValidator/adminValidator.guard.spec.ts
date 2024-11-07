@@ -26,15 +26,12 @@ describe("AdminValidatorGuard", () => {
   };
   const userPrismaMock = {
     findUserByStrId: (userId: string) => {
-      console.log(userId, "findUserByStrId");
       return true;
     },
     findUserById: (id: string) => {
-      console.log(id, "findUserById");
       return true;
     },
     findUserByNumber: (number?: number) => {
-      console.log(number, "findUserByNumber");
       return true;
     },
   };

@@ -242,6 +242,33 @@ export class PrismaService
     }
   }
 
+  async findCountVoterPer(
+    id: string,
+  ): Promise<
+    { user_role: string; voted_count: number; total_count: number }[]
+  > {
+    try {
+      const cnt = await this.$queryRaw<
+        { user_role: string; voted_count: number; total_count: number }[]
+      >`
+        SELECT
+          user_role::TEXT,
+          COUNT(CASE WHEN v.user_id IS NOT NULL THEN 1 END)::INTEGER as voted_count,
+          COUNT(*)::INTEGER as total_count
+        FROM foreign_user fu
+        LEFT JOIN "Vote" v
+        ON fu.user_id = v.user_id AND v.contest_id = ${id}
+        WHERE user_role::TEXT IN ('Student', 'Teacher')
+        GROUP BY user_role
+      `;
+
+      return cnt;
+    } catch (e) {
+      this.logger.error(e);
+      throw new InternalServerErrorException(e);
+    }
+  }
+
   async patchClubStatus(clubId: string) {
     try {
       const thisClub = await this.findClub(clubId);

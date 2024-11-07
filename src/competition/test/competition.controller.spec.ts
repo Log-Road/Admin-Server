@@ -3,7 +3,7 @@ import { CompetitionController } from "../competition.controller";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "../../prisma/prisma.service";
 import { CompetitionService } from "../competition.service";
-import { BadRequestException, Logger } from "@nestjs/common";
+import { BadRequestException, Logger, NotFoundException } from "@nestjs/common";
 import { PostCompetitionRequestDto } from "../dto/request/postCompetition.request.dto";
 import { PostAwardsRequestDto } from "../dto/request/postAwards.request.dto";
 import { COMPETITION_STATUS } from "../../prisma/client";
@@ -87,6 +87,12 @@ describe("CompetitionController", () => {
         ],
       };
     }),
+    getVotePer: jest.fn(() => {
+      return {
+        student: 26,
+        teacher: 3,
+      };
+    }),
     patchCompetition: jest.fn(() => {
       return {
         id: "1",
@@ -110,11 +116,7 @@ describe("CompetitionController", () => {
 
     controller = module.get<CompetitionController>(CompetitionController);
 
-    serviceMock.postCompetition.mockClear();
-    serviceMock.postAwards.mockClear();
-    serviceMock.getCompetitionList.mockClear();
-    serviceMock.getCompetition.mockClear();
-    serviceMock.getNonVoterList.mockClear();
+    jest.clearAllMocks();
   });
 
   describe("PostCompetition", () => {
@@ -314,6 +316,35 @@ describe("CompetitionController", () => {
         statusCode: 200,
         statusMsg: "",
       });
+    });
+  });
+
+  describe("GetVotePer", () => {
+    const id = "b6ee2cd2-4596-47ee-b332-de87e1p39e80";
+
+    it("[200]", async () => {
+      const res = await controller.getVotePer(id);
+
+      expect(serviceMock.getVotePer).toHaveBeenCalledTimes(1);
+      expect(serviceMock.getVotePer).toHaveBeenCalledWith(id);
+      expect(res).toEqual({
+        data: {
+          student: 26,
+          teacher: 3,
+        },
+        statusCode: 200,
+        statusMsg: "",
+      });
+    });
+
+    it("[400] empty id", async () => {
+      const id = undefined;
+
+      await expect(async () => await controller.getVotePer(id)).rejects.toThrow(
+        new BadRequestException(),
+      );
+      expect(serviceMock.getVotePer).toHaveBeenCalledTimes(0);
+      expect(serviceMock.getCompetition).toHaveBeenCalledTimes(0);
     });
   });
 
