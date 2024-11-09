@@ -6,6 +6,7 @@ import { CompetitionModule } from "./competition/competition.module";
 import { WinstonInstance } from "utils/winston";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { GuardModule } from "./guard/guard.module";
+import { ProjectModule } from './project/project.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { GuardModule } from "./guard/guard.module";
     ClubModule,
     CompetitionModule,
     GuardModule,
+    ProjectModule,
   ],
   controllers: [],
   providers: [],
